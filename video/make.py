@@ -2,7 +2,7 @@
 """Сборка Shorts из сценария: python3 video/make.py video/stories/tp-001-chat.json
 Результат: video/out/<id>.mp4
 
-Голос: Piper ru_RU-ruslan-medium + voice_natural.py (ударения, паузы, вдохи) + подгонка тембра (ниже, плотнее).
+Голос: Vosk TTS male_1 + обработка (см. voice()). Запасной — Piper ruslan (story.voice = "piper").
 Нужно (один раз): см. video/SETUP.md
 """
 import json, os, subprocess, sys
@@ -20,19 +20,36 @@ def run(*a, **k):
     subprocess.run([str(x) for x in a], check=True, **k)
 
 
+# Обработка «как E»: чуть ниже, плотнее, присутствие, лёгкая комната. "clean" — без неё (вариант C).
+POST = {
+    "E": "aresample=48000,rubberband=pitch=0.94:formant=preserved,highpass=f=70,equalizer=f=120:t=q:w=1:g=3,"
+         "equalizer=f=3500:t=q:w=1.2:g=2,deesser=i=0.4,acompressor=threshold=0.1:ratio=3:attack=8:release=180,"
+         "aecho=0.8:0.5:40:0.06,alimiter=limit=0.9",
+    "C": "aresample=48000,highpass=f=60,alimiter=limit=0.9",
+}
+
+
 def voice(story, out):
+    """Голос по умолчанию: Vosk male_1 (speaker 4) + обработка E. story.voice = "piper" — старый Piper."""
     txt = out / "voiceover.txt"
     txt.write_text("\n\n".join(sc["text"] for sc in story["scenes"]) + "\n", encoding="utf-8")
     raw, words = out / "raw.wav", out / "words_raw.json"
-    env = dict(os.environ, LS_MUL="0.93", NOISE_W="1.05")
-    run(PY, "-I", ROOT / "voice_natural.py", MODEL, txt, raw, words, "--raw", env=env, capture_output=True)
     v = out / "voice.wav"
-    run("ffmpeg", "-v", "error", "-y", "-i", raw, "-af",
-        f"rubberband=pitch=0.87:tempo={TEMPO}:formant=preserved,{EQ},"
-        "acompressor=threshold=0.12:ratio=2.5:attack=8:release=180,alimiter=limit=0.9", "-ar", "48000", v)
+    if story.get("voice") == "piper":
+        env = dict(os.environ, LS_MUL="0.93", NOISE_W="1.05")
+        run(PY, "-I", ROOT / "voice_natural.py", MODEL, txt, raw, words, "--raw", env=env, capture_output=True)
+        run("ffmpeg", "-v", "error", "-y", "-i", raw, "-af",
+            f"rubberband=pitch=0.87:tempo={TEMPO}:formant=preserved,{EQ},"
+            "acompressor=threshold=0.12:ratio=2.5:attack=8:release=180,alimiter=limit=0.9", "-ar", "48000", v)
+        k = TEMPO
+    else:
+        run(PY, "-I", ROOT / "voice_vosk.py", txt, raw, words, story.get("speaker", 4), story.get("rate", 0.95),
+            capture_output=True)
+        run("ffmpeg", "-v", "error", "-y", "-i", raw, "-af", POST[story.get("post", "E")], "-ar", "48000", v)
+        k = 1.0
     d = json.loads(words.read_text(encoding="utf-8"))
-    ws = [{"w": w["w"], "start": round(w["t"] / TEMPO, 3), "end": round(w["e"] / TEMPO, 3)} for w in d["words"]]
-    return v, ws, d["duration"] / TEMPO
+    ws = [{"w": w["w"], "start": round(w["t"] / k, 3), "end": round(w["e"] / k, 3)} for w in d["words"]]
+    return v, ws, d["duration"] / k
 
 
 def split_scenes(story, ws, total):
