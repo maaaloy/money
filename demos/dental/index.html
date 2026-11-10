@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Стоматология «Улыбка 32» — лечение без боли</title>
+<meta name="description" content="Лечение, имплантация и чистка зубов. Первичная консультация бесплатно. Запись онлайн.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6fafb;--ink:#0f2a33;--muted:#5b7680;--brand:#0f9bab;--brand2:#0b7783;--card:#fff;--line:#dfeaee}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Manrope,system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:0;background:rgba(246,250,251,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);z-index:10}
+.nav{display:flex;align-items:center;justify-content:space-between;height:68px;gap:16px}
+.logo{font-weight:800;font-size:20px;display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo span{width:34px;height:34px;border-radius:10px;background:var(--brand);display:grid;place-items:center;color:#fff;font-size:15px}
+.nav nav a{margin-left:24px;text-decoration:none;color:var(--muted);font-weight:600}
+.nav nav a:hover{color:var(--ink)}
+.phone{font-weight:800;text-decoration:none;white-space:nowrap}
+.btn{display:inline-block;background:var(--brand);color:#fff;padding:15px 26px;border-radius:12px;font-weight:700;text-decoration:none;border:0;cursor:pointer;font:inherit;font-weight:700}
+.btn:hover{background:var(--brand2)}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.hero{padding:72px 0 56px;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.tag{display:inline-block;background:#dff4f6;color:var(--brand2);padding:6px 12px;border-radius:99px;font-weight:700;font-size:14px;margin-bottom:18px}
+h1{font-size:clamp(34px,5vw,56px);line-height:1.08;letter-spacing:-.02em;margin-bottom:20px}
+h2{font-size:clamp(28px,3.5vw,40px);letter-spacing:-.01em;margin-bottom:12px}
+.lead{font-size:19px;color:var(--muted);margin-bottom:30px;max-width:540px}
+.hero .actions{display:flex;gap:12px;flex-wrap:wrap}
+.facts{display:flex;gap:32px;margin-top:40px;flex-wrap:wrap}
+.facts b{display:block;font-size:28px}
+.facts small{color:var(--muted)}
+.art{aspect-ratio:1/1;border-radius:32px;background:radial-gradient(circle at 30% 30%,#c9f0f4,#8fd9e1 45%,#0f9bab);position:relative;overflow:hidden}
+.art svg{position:absolute;inset:14%;width:72%;height:72%}
+.badge{position:absolute;left:-12px;bottom:28px;background:#fff;border-radius:16px;padding:14px 18px;box-shadow:0 12px 30px rgba(15,42,51,.12);font-weight:700}
+.badge small{display:block;color:var(--muted);font-weight:400}
+section{padding:72px 0}
+.sub{color:var(--muted);margin-bottom:36px;max-width:620px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px}
+.card h3{font-size:20px;margin-bottom:8px}
+.card p{color:var(--muted);margin-bottom:16px}
+.price{font-weight:800;font-size:20px;color:var(--brand2)}
+.ico{width:48px;height:48px;border-radius:14px;background:#dff4f6;display:grid;place-items:center;margin-bottom:18px;font-size:24px}
+.why{background:var(--ink);color:#fff;border-radius:32px;padding:56px}
+.why .sub{color:#a9c2ca}
+.why .grid{grid-template-columns:repeat(4,1fr)}
+.why .item b{display:block;font-size:18px;margin-bottom:6px}
+.why .item span{color:#a9c2ca}
+.doc{display:flex;gap:16px;align-items:center}
+.ava{width:64px;height:64px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:800;color:#fff;font-size:22px}
+.review p{color:var(--ink);margin-bottom:14px}
+.stars{color:#f5a623;letter-spacing:2px;margin-bottom:10px}
+details{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 24px;margin-bottom:12px}
+summary{font-weight:700;cursor:pointer;font-size:17px}
+details p{color:var(--muted);margin-top:10px}
+.cta{display:grid;grid-template-columns:1fr 1fr;gap:40px;background:#fff;border:1px solid var(--line);border-radius:32px;padding:48px}
+form{display:grid;gap:12px}
+input,select{font:inherit;padding:15px 16px;border-radius:12px;border:1px solid var(--line);background:var(--bg);width:100%}
+.ok{display:none;background:#dff4f6;color:var(--brand2);padding:14px;border-radius:12px;font-weight:700}
+.note{font-size:13px;color:var(--muted)}
+footer{padding:40px 0;color:var(--muted);border-top:1px solid var(--line);margin-top:40px}
+.foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.map{height:260px;border-radius:20px;background:repeating-linear-gradient(45deg,#e7f1f3 0 12px,#eef6f8 12px 24px);display:grid;place-items:center;color:var(--muted);font-weight:700;margin-top:20px}
+@media (max-width:900px){
+ .hero,.cta{grid-template-columns:1fr}
+ .grid,.why .grid{grid-template-columns:1fr 1fr}
+ .nav nav{display:none}
+ .why,.cta{padding:32px 24px}
+}
+@media (max-width:560px){
+ .grid,.why .grid{grid-template-columns:1fr}
+ .hero{padding-top:40px}
+ .phone{font-size:14px}
+ .badge{left:12px}
+}
+</style>
+</head>
+<body>
+<header><div class="wrap nav">
+ <a class="logo" href="#"><span>32</span>Улыбка 32</a>
+ <nav><a href="#services">Услуги</a><a href="#doctors">Врачи</a><a href="#reviews">Отзывы</a><a href="#contacts">Контакты</a></nav>
+ <a class="phone" href="tel:+70000000000">+7 (000) 000-00-00</a>
+</div></header>
+
+<main class="wrap">
+<div class="hero">
+ <div>
+  <div class="tag">Первичная консультация — бесплатно</div>
+  <h1>Лечим зубы без боли и без лишних услуг</h1>
+  <p class="lead">Семейная стоматология в центре города. Сначала план лечения с точной ценой, потом лечение. Никаких сюрпризов в чеке.</p>
+  <div class="actions"><a class="btn" href="#form">Записаться на приём</a><a class="btn ghost" href="#services">Цены</a></div>
+  <div class="facts"><div><b>12 лет</b><small>работаем в городе</small></div><div><b>8 000+</b><small>пациентов</small></div><div><b>4,9 ★</b><small>на Яндекс Картах</small></div></div>
+ </div>
+ <div class="art">
+  <svg viewBox="0 0 100 100" fill="none"><path d="M50 18c-8-6-26-8-30 8-3 12 4 22 6 34 2 14 4 26 10 26 7 0 5-20 14-20s7 20 14 20c6 0 8-12 10-26 2-12 9-22 6-34-4-16-22-14-30-8z" fill="#fff"/><path d="M38 34c4-3 10-3 12 0" stroke="#0f9bab" stroke-width="3" stroke-linecap="round"/></svg>
+  <div class="badge">Без боли — гарантируем<small>современная анестезия</small></div>
+ </div>
+</div>
+
+<section id="services">
+ <h2>Услуги и цены</h2>
+ <p class="sub">Цены фиксируются в плане лечения до начала работы.</p>
+ <div class="grid">
+  <div class="card"><div class="ico">🦷</div><h3>Лечение кариеса</h3><p>Светоотверждаемая пломба, анестезия включена.</p><div class="price">от 3 500 ₽</div></div>
+  <div class="card"><div class="ico">✨</div><h3>Профгигиена</h3><p>Ультразвук, Air Flow, полировка и фторирование.</p><div class="price">от 4 900 ₽</div></div>
+  <div class="card"><div class="ico">🔩</div><h3>Имплантация</h3><p>Имплант под ключ с коронкой. Гарантия 10 лет.</p><div class="price">от 39 000 ₽</div></div>
+  <div class="card"><div class="ico">👑</div><h3>Коронки</h3><p>Металлокерамика, цирконий, E.max.</p><div class="price">от 12 000 ₽</div></div>
+  <div class="card"><div class="ico">😁</div><h3>Отбеливание</h3><p>Профессиональное отбеливание за один визит.</p><div class="price">от 14 000 ₽</div></div>
+  <div class="card"><div class="ico">🧒</div><h3>Детская стоматология</h3><p>Лечение в игровой форме, без страха.</p><div class="price">от 2 500 ₽</div></div>
+ </div>
+</section>
+
+<section><div class="why">
+ <h2>Почему выбирают нас</h2>
+ <p class="sub">То, что пациенты чаще всего отмечают в отзывах.</p>
+ <div class="grid">
+  <div class="item"><b>План с ценой</b><span>Вы знаете итоговую стоимость до начала лечения.</span></div>
+  <div class="item"><b>Без очередей</b><span>Приём строго по времени, 7 дней в неделю.</span></div>
+  <div class="item"><b>Рассрочка 0%</b><span>На имплантацию и протезирование до 12 месяцев.</span></div>
+  <div class="item"><b>Налоговый вычет</b><span>Подготовим документы для возврата 13%.</span></div>
+ </div>
+</div></section>
+
+<section id="doctors">
+ <h2>Врачи</h2>
+ <p class="sub">Стаж каждого врача — от 8 лет.</p>
+ <div class="grid">
+  <div class="card doc"><div class="ava" style="background:#0f9bab">АК</div><div><h3>Анна Королёва</h3><p style="margin:0">Терапевт, главный врач · 15 лет</p></div></div>
+  <div class="card doc"><div class="ava" style="background:#0b7783">ИС</div><div><h3>Игорь Смирнов</h3><p style="margin:0">Хирург-имплантолог · 12 лет</p></div></div>
+  <div class="card doc"><div class="ava" style="background:#3bb5c3">МВ</div><div><h3>Мария Волкова</h3><p style="margin:0">Детский стоматолог · 8 лет</p></div></div>
+ </div>
+</section>
+
+<section id="reviews">
+ <h2>Отзывы пациентов</h2>
+ <p class="sub">Из отзывов на Яндекс Картах и 2ГИС.</p>
+ <div class="grid">
+  <div class="card review"><div class="stars">★★★★★</div><p>«Боялась стоматологов с детства. Здесь впервые не было больно вообще. Спасибо Анне Сергеевне!»</p><b>Елена</b></div>
+  <div class="card review"><div class="stars">★★★★★</div><p>«Ставил два импланта. Цена в итоге совпала с планом до рубля, это редкость».</p><b>Дмитрий</b></div>
+  <div class="card review"><div class="stars">★★★★★</div><p>«Водим сюда обоих детей. Сын теперь сам просится на осмотр».</p><b>Ольга</b></div>
+ </div>
+</section>
+
+<section>
+ <h2>Частые вопросы</h2>
+ <p class="sub">&nbsp;</p>
+ <details><summary>Сколько стоит первый приём?</summary><p>Консультация и составление плана лечения бесплатны.</p></details>
+ <details><summary>Можно ли лечиться в рассрочку?</summary><p>Да, рассрочка 0% до 12 месяцев на имплантацию и протезирование.</p></details>
+ <details><summary>Работаете ли вы в выходные?</summary><p>Да, ежедневно с 9:00 до 21:00.</p></details>
+ <details><summary>Даёте ли вы гарантию?</summary><p>Гарантия на пломбы — 2 года, на импланты — 10 лет.</p></details>
+</section>
+
+<section id="form"><div class="cta">
+ <div><h2>Запишитесь на бесплатную консультацию</h2><p class="sub">Администратор перезвонит в течение 15 минут и подберёт удобное время.</p></div>
+ <form onsubmit="event.preventDefault();this.querySelector('.ok').style.display='block';this.reset()">
+  <input required placeholder="Ваше имя">
+  <input required type="tel" placeholder="Телефон">
+  <select><option>Консультация</option><option>Лечение</option><option>Гигиена</option><option>Имплантация</option></select>
+  <button class="btn" type="submit">Записаться</button>
+  <div class="ok">Спасибо! Мы скоро перезвоним.</div>
+  <p class="note">Нажимая кнопку, вы соглашаетесь с политикой обработки персональных данных.</p>
+ </form>
+</div></section>
+
+<section id="contacts">
+ <h2>Контакты</h2>
+ <p class="sub">ул. Примерная, 32 · ежедневно 9:00–21:00 · <a href="tel:+70000000000">+7 (000) 000-00-00</a></p>
+ <div class="map">Здесь будет карта</div>
+</section>
+</main>
+
+<footer><div class="wrap foot"><span>© Стоматология «Улыбка 32». Лицензия № ЛО-00-00-000000</span><span>Демо-проект. Имеются противопоказания, необходима консультация специалиста.</span></div></footer>
+</body>
+</html>
