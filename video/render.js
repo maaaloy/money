@@ -15,13 +15,21 @@ const FPS = 30;
   await page.evaluate(t => window.setTimeline(t), tl);
   await page.evaluate(() => document.fonts.ready);
 
+  if (process.env.PREVIEW) {
+    for (const t of process.env.PREVIEW.split(',').map(Number)) {
+      await page.evaluate(([t, f]) => window.render(t, f), [t, Math.round(t * FPS)]);
+      await page.screenshot({ path: `${out}-${t}.png`, type: 'png' });
+    }
+    await browser.close();
+    return;
+  }
   const ff = spawn('ffmpeg', ['-v', 'error', '-y', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-',
     '-i', voice, '-c:v', 'libx264', '-preset', 'medium', '-crf', '20', '-pix_fmt', 'yuv420p',
     '-af', 'apad', '-t', String(tl.duration), '-c:a', 'aac', '-b:a', '160k', '-movflags', '+faststart', out], { stdio: ['pipe', 'inherit', 'inherit'] });
 
   const frames = Math.ceil(tl.duration * FPS);
   for (let i = 0; i < frames; i++) {
-    await page.evaluate(t => window.render(t), i / FPS);
+    await page.evaluate(([t, f]) => window.render(t, f), [i / FPS, i]);
     const buf = await page.screenshot({ type: 'jpeg', quality: 90 });
     if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r));
     if (i % 300 === 0) process.stderr.write(`frame ${i}/${frames}\n`);
