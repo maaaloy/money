@@ -173,7 +173,7 @@ window.render=(T,frame)=>{
  // субтитры-караоке: по 3 слова, текущее — жёлтое
  const w=sc.words;let i=w.findLastIndex(x=>x.start<=T);if(i<0)i=0;const c0=Math.floor(i/3)*3,chunk=w.slice(c0,c0+3);
  const cap=document.getElementById('cap');
- cap.innerHTML=chunk.map((x,j)=>`<span class="${c0+j===i?'on':(c0+j<i?'past':'fut')}">${esc(x.w.replace(/[«»"]/g,'').replace(/[,;:.]$/,''))}</span>`).join(' ');
+ cap.innerHTML=chunk.filter(x=>/[0-9a-zа-яё]/i.test(x.w)).map((x,j)=>`<span class="${c0+j===i?'on':(c0+j<i?'past':'fut')}">${esc(x.w.replace(/[«»"]/g,'').replace(/[,;:.]$/,''))}</span>`).join(' ');
  cap.style.transform=`scale(${1+0.06*(1-ease((T-w[c0].start)/0.12))})`;
  document.getElementById('bar').style.width=(T/TL.duration*1080)+'px';
 };

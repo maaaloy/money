@@ -5,7 +5,7 @@
 Голос: Vosk TTS male_1 + обработка (см. voice()). Запасной — Piper ruslan (story.voice = "piper").
 Нужно (один раз): см. video/SETUP.md
 """
-import json, os, subprocess, sys
+import json, os, re, subprocess, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -32,7 +32,7 @@ POST = {
 def voice(story, out):
     """Голос по умолчанию: Vosk male_1 (speaker 4) + обработка E. story.voice = "piper" — старый Piper."""
     txt = out / "voiceover.txt"
-    txt.write_text("\n\n".join(sc["text"] for sc in story["scenes"]) + "\n", encoding="utf-8")
+    txt.write_text("\n\n".join(sc["text"] for sc in story["scenes"] if sc.get("text")) + "\n", encoding="utf-8")
     raw, words = out / "raw.wav", out / "words_raw.json"
     v = out / "voice.wav"
     if story.get("voice") == "piper":
@@ -54,15 +54,35 @@ def voice(story, out):
 
 def split_scenes(story, ws, total):
     i = 0
-    for sc in story["scenes"]:
+    spoken = [sc for sc in story["scenes"] if sc.get("text")]
+    for sc in spoken:
         n = len(sc["text"].split())
         sc["words"] = ws[i:i + n]
         i += n
-    for k, sc in enumerate(story["scenes"]):
+    for k, sc in enumerate(spoken):
         sc["start"] = 0.0 if k == 0 else round(sc["words"][0]["start"] - 0.25, 3)
-    for k, sc in enumerate(story["scenes"]):
-        sc["end"] = story["scenes"][k + 1]["start"] if k + 1 < len(story["scenes"]) else round(total + 0.6, 3)
-    story["duration"] = story["scenes"][-1]["end"]
+    for k, sc in enumerate(spoken):
+        sc["end"] = spoken[k + 1]["start"] if k + 1 < len(spoken) else round(total + 0.6, 3)
+    t = spoken[-1]["end"]
+    for sc in story["scenes"]:  # немые сцены (заставка в конце)
+        if not sc.get("text"):
+            sc["words"], sc["start"], sc["end"] = [], t, round(t + sc.get("dur", 2.5), 3)
+            t = sc["end"]
+    story["duration"] = max(sc["end"] for sc in story["scenes"])
+    # числа в субтитрах цифрами: story.num = [["сто двенадцать", "112"], ...]
+    for phrase, digits in story.get("num", []):
+        toks = phrase.lower().split()
+        for sc in spoken:
+            w, out, j = sc["words"], [], 0
+            while j < len(w):
+                seg = [re.sub(r"[^\wё]", "", x["w"].lower()) for x in w[j:j + len(toks)]]
+                if seg == toks:
+                    tail = re.sub(r"^[\wё-]+", "", w[j + len(toks) - 1]["w"])
+                    out.append(dict(w[j], show=digits + tail.rstrip(",;:."), end=w[j + len(toks) - 1]["end"]))
+                    j += len(toks)
+                else:
+                    out.append(w[j]); j += 1
+            sc["words"] = out
 
 
 def sfx_list(story):
@@ -76,6 +96,8 @@ def sfx_list(story):
                 fx.append(("buzz", sc["start"] + m["at"]))
         if sc.get("scare"):
             fx.append(("hit", sc["start"] + 0.05))
+        if story.get("impacts") and sc.get("text") and sc["start"] > 0:
+            fx.append(("thud", sc["start"]))
         if sc.get("openDoor"):
             fx.append(("creak", sc["start"] + 0.2))
     return fx
@@ -85,6 +107,7 @@ SYNTH = {
     "knock": ("0.35", "(sin(2*PI*65*t)+0.6*sin(2*PI*130*t)+0.3*(random(0)-0.5)*exp(-60*t))*exp(-22*t)", 0.9),
     "buzz": ("0.55", "sin(2*PI*175*t)*gt(sin(2*PI*3.6*t),0)*0.6", 0.35),
     "hit": ("2.2", "(sin(2*PI*42*t)+0.5*sin(2*PI*84*t)+0.4*(random(0)-0.5))*exp(-2.2*t)", 0.8),
+    "thud": ("0.9", "(sin(2*PI*55*t)+0.3*(random(0)-0.5)*exp(-30*t))*exp(-5*t)", 0.35),
     "creak": ("1.4", "sin(2*PI*(310+90*sin(2*PI*1.3*t))*t)*0.35*sin(PI*t/1.4)*(0.6+0.4*sin(2*PI*23*t))", 0.25),
 }
 
