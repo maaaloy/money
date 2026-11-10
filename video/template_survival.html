@@ -107,13 +107,14 @@ const SC={
  },
  end(sc,T){
   return {svg:city(T),ui:`<div style="position:absolute;left:0;right:0;top:560px;text-align:center;font:900 116px/1 Inter;letter-spacing:-2px;${popS(T,sc.start+0.1)}">ВЫЖИВАНИЕ<br>ПОСЛЕ<span style="color:${COL.r}">…</span></div>
-   <div style="position:absolute;left:0;right:0;top:860px;text-align:center;font:700 32px 'DejaVu Sans Mono';color:${COL.y};letter-spacing:.06em;${popS(T,sc.start+0.6)}">ПОДПИШИСЬ — НОВЫЙ СЦЕНАРИЙ КАЖДЫЙ ДЕНЬ</div>`};
+   <div style="position:absolute;left:0;right:0;top:860px;text-align:center;font:700 32px 'DejaVu Sans Mono';color:${COL.y};letter-spacing:.06em;${popS(T,sc.start+0.6)}">${sc.next?'▶ '+esc(sc.next):'ПОДПИШИСЬ — НОВЫЙ СЦЕНАРИЙ КАЖДЫЙ ДЕНЬ'}</div>`};
  },
 };
 function plaques(sc,T){return (sc.plaques||[]).map(p=>{const t0=at(sc,p.on),c=COL[p.c||'y'];
  return `<div class="plq" style="left:${p.x??90}px;right:${p.r??90}px;top:${p.y??1080}px;border-color:${c};color:${c};${popS(T,t0)}"><b>${esc(p.title)}</b>${p.sub?`<small>${esc(p.sub)}</small>`:''}</div>`}).join('')}
 
 // субтитры: числа цифрами (story.num), акценты цветом (story.acc)
+function chunkOf(w,i){if(!w._ch){const st=[];let n=0;for(let k=0;k<w.length;k++){if(k===0||n>=3||/[.!?,…:»;]$/.test(w[k-1].w)){st.push(k);n=0}n++}w._ch=st}const st=w._ch;let c0=0;for(const s of st)if(s<=i)c0=s;const nx=st.find(s=>s>c0)??w.length;return [c0,nx]}
 let TL=null,ACC={};
 window.setTimeline=tl=>{TL=tl;for(const [c,list] of Object.entries(tl.acc||{}))for(const ph of list)for(const w of ph.toLowerCase().split(' '))ACC[w]=c;
  if(tl.hook)document.getElementById('hook').innerHTML=tl.hook};
@@ -124,9 +125,9 @@ window.render=(T,frame)=>{
   <g transform="translate(540 900) scale(${z}) translate(-540 -900)" opacity="${clamp(lt/0.2)}">${r.svg||''}</g><rect width="1080" height="1920" fill="url(#vg)"/>`;
  const ui=document.getElementById('ui');ui.innerHTML=(r.ui||'')+plaques(sc,T);ui.style.opacity=clamp(lt/0.2);ui.style.transform=`scale(${z})`;ui.style.transformOrigin='540px 900px';
  gx.imageSmoothingEnabled=false;gx.drawImage(GR[(frame||0)%6],0,0,1208,2048);
- const hud=document.querySelector('#hud span');hud.textContent=sc.hud||TL.hud||'';hud.parentElement.style.display=(sc.hud||TL.hud)&&sc.type!=='end'?'':'none';
+ const hud=document.querySelector('#hud span');hud.textContent=(sc.hud||TL.hud||'')+(TL.part?(TL.part===TL.parts_total?' · ФИНАЛ':` · ЧАСТЬ ${TL.part}/${TL.parts_total}`):'');hud.parentElement.style.display=(sc.hud||TL.hud)&&sc.type!=='end'?'':'none';
  const h=document.getElementById('hook');h.style.opacity=clamp(T/0.25)*(1-clamp((T-2.2)/0.35));h.style.transform=`scale(${1.08-0.08*ease(T/0.5)})`;
- const w=sc.words||[];let i=w.findLastIndex(x=>x.start<=T);if(i<0)i=0;const c0=Math.floor(i/3)*3,chunk=w.slice(c0,c0+3);
+ const w=sc.words||[];let i=w.findLastIndex(x=>x.start<=T);if(i<0)i=0;const [c0,c1]=chunkOf(w,i),chunk=w.slice(c0,c1);
  const cap=document.getElementById('cap');
  cap.innerHTML=chunk.filter(x=>/[0-9a-zа-яё]/i.test(x.show??x.w)).map((x,j)=>{const key=x.w.toLowerCase().replace(/[^\wё]/g,'');const col=ACC[key]?COL[ACC[key]]:'#fff';
   return `<span class="${c0+j>i?'fut':''}" style="color:${col}">${esc(x.show??x.w.replace(/[«»"]/g,'').replace(/[,;:.]$/,''))}</span>`}).join(' ');

@@ -135,8 +135,7 @@ def mix(story, v, out):
     return m
 
 
-def main(story_path):
-    story = json.loads(Path(story_path).read_text(encoding="utf-8"))
+def build(story):
     out = ROOT / "out" / story["id"]
     out.mkdir(parents=True, exist_ok=True)
     v, ws, total = voice(story, out)
@@ -150,5 +149,31 @@ def main(story_path):
     print(mp4)
 
 
+def expand(data):
+    """Тема из нескольких частей → отдельные ролики <id>-p1.. с анонсом следующей части в конце."""
+    if "parts" not in data:
+        return [data]
+    shared = {k: v for k, v in data.items() if k != "parts"}
+    n, times, res = len(data["parts"]), data.get("times", []), []
+    surv = "survival" in data.get("template", "")
+    for i, part in enumerate(data["parts"], 1):
+        st = {**shared, **part, "id": f"{data['id']}-p{i}", "part": i, "parts_total": n}
+        nxt = f"ЧАСТЬ {i + 1}" + (f" · СЕГОДНЯ В {times[i]}" if i < len(times) else "") if i < n else None
+        if i == n - 1 and nxt:
+            nxt = "ФИНАЛ" + (f" · СЕГОДНЯ В {times[i]}" if i < len(times) else "")
+        end = {"text": "", "dur": 2.6, "next": nxt}
+        end.update({"type": "end"} if surv else {"bg": "next"})
+        st["scenes"] = list(part["scenes"]) + [end]
+        res.append(st)
+    return res
+
+
+def main(story_path, only=None):
+    data = json.loads(Path(story_path).read_text(encoding="utf-8"))
+    for k, st in enumerate(expand(data), 1):
+        if only is None or k == only:
+            build(st)
+
+
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(sys.argv[1], int(sys.argv[2]) if len(sys.argv) > 2 else None)
