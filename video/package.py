@@ -22,11 +22,11 @@ for date, items in days.items():
     lines = [f"ПУБЛИКАЦИИ НА {date}\n"]
     for time, d, i, part in sorted(items, key=lambda x: x[0]):
         src = ROOT / "out" / f"{d['id']}-p{i}.mp4"
-        name = f"{time.replace(':', '-')}_{SHORT[d['template']]}_ch{i}.mp4"
+        name = f"{date}_{time.replace(':', '-')}_{SHORT[d['template']]}_ch{i}.mp4"
         status = "OK" if src.exists() else "НЕТ ФАЙЛА"
         if src.exists():
             shutil.copy(src, out / name)
         lines += [f"=== {time} · {CH[d['template']]} · «{d['theme']}» · часть {i}/{len(d['parts'])} · {name} [{status}]",
                   f"Название: {part['title']}", f"Описание:\n{part['description']}", ""]
-    (out / "publish.txt").write_text("\n".join(lines), encoding="utf-8")
+    (out / f"publish_{date}.txt").write_text("\n".join(lines), encoding="utf-8")
     print(out)
