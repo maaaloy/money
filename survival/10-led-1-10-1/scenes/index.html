@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>10 — Лёд 1-10-1</title>
+<style>
+:root{--bg:#07080c;--y:#f5c542;--r:#ff3b3b;--c:#3ee6ff;--g:#3dff8f;--gr:#8a8f9c;--w:#f2f4f8}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1920px;background:var(--bg);overflow:hidden}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:Inter,sans-serif;color:var(--w)}
+#bg,#grain{position:absolute;inset:0}
+.scene{position:absolute;inset:0;opacity:0;transform-origin:540px 720px}
+#hud{position:absolute;top:150px;left:0;right:0;text-align:center}
+#clock{display:inline-block;font:700 30px 'JetBrains Mono',monospace;color:var(--y);background:rgba(20,18,8,.85);border:2px solid rgba(245,197,66,.35);padding:8px 20px;border-radius:6px;letter-spacing:1px}
+#cap{position:absolute;left:70px;right:70px;top:1290px;text-align:center;font:900 76px/1.04 Inter,sans-serif;text-transform:uppercase;letter-spacing:-1px}
+#cap span{display:inline-block;margin:0 .13em;text-shadow:0 4px 18px rgba(0,0,0,.9),0 0 2px #000}
+#vig{position:absolute;inset:0;background:radial-gradient(ellipse 80% 65% at 50% 42%,transparent 50%,rgba(0,0,0,.75) 100%),repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 2px,transparent 2px 4px);pointer-events:none}
+#flash{position:absolute;inset:0;background:#fff;opacity:0}
+.abs{position:absolute}
+.plq{position:absolute;display:flex;gap:16px;align-items:center;padding:14px 22px 14px 16px;border:3px solid currentColor;border-radius:10px;background:rgba(7,9,14,.88);box-shadow:0 0 26px -4px currentColor,inset 0 0 18px -8px currentColor;opacity:0;white-space:nowrap}
+.plq i{width:34px;height:34px;border:2.5px solid currentColor;border-radius:6px;display:grid;place-items:center;font:900 22px Inter;font-style:normal}
+.plq i::after{content:'!'}
+.plq.c i::after,.plq.g i::after{content:'i'}
+.plq b{display:block;font:800 34px/1.1 Inter;color:var(--w);text-transform:uppercase}
+.plq small{display:block;font:500 19px 'JetBrains Mono',monospace;color:currentColor;opacity:.85;margin-top:3px;text-transform:uppercase}
+.y{color:var(--y)}.r{color:var(--r)}.c{color:var(--c)}.g{color:var(--g)}.gr{color:var(--gr)}
+.mono{font-family:'JetBrains Mono',monospace}
+/* s1 */
+.dev{position:absolute}
+.tv{left:150px;top:290px;width:780px;height:460px;border:10px solid #1a1d24;border-radius:14px;background:#050608}
+.tv .stand{position:absolute;left:330px;bottom:-56px;width:100px;height:46px;background:#14161c;border-radius:0 0 8px 8px}
+.ph{left:170px;top:830px;width:260px;height:420px;border:9px solid #1a1d24;border-radius:36px;background:#050608}
+.spk{left:660px;top:880px;width:230px;height:330px;border-radius:40px;background:linear-gradient(90deg,#15171d,#22252d 50%,#15171d)}
+.scr{position:absolute;inset:0;border-radius:inherit;overflow:hidden;opacity:0;background:radial-gradient(ellipse at 50% 40%,#5a0b10,#22050a 75%);box-shadow:inset 0 0 60px rgba(255,59,59,.35)}
+.scrc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+.hdr{font:600 22px 'JetBrains Mono';color:#ff8a8a;letter-spacing:2px}
+.big{font:900 84px/1 Inter;color:#fff;text-shadow:0 0 30px rgba(255,59,59,.8)}
+.big.sm{font-size:40px;padding:0 16px}
+.ring{position:absolute;left:25px;right:25px;top:18px;height:26px;border-radius:13px;background:#2a2d35}
+.mesh{position:absolute;left:22px;right:22px;top:70px;bottom:80px;background:radial-gradient(circle,#0b0c10 2.5px,transparent 3px) 0 0/16px 16px}
+.led{position:absolute;left:24px;right:24px;bottom:22px;height:40px;border-radius:6px;background:#080809;overflow:hidden;font:700 24px/40px 'JetBrains Mono';color:var(--r);white-space:nowrap}
+.led span{display:inline-block}
+/* bars / generic */
+.bar{position:absolute;height:26px;border:3px solid currentColor;border-radius:8px;overflow:hidden}
+.bar>div{height:100%;background:currentColor;width:0}
+.chk{position:absolute;left:150px;width:780px;padding:22px 28px;border:2px solid #2a2f3a;border-radius:12px;background:rgba(10,12,18,.9)}
+.chk h4{font:600 20px 'JetBrains Mono';color:var(--y);letter-spacing:2px;margin-bottom:12px}
+.chk p{font:800 32px/1.55 Inter;text-transform:uppercase;color:#6b7080;display:flex;align-items:center;gap:16px}
+.chk p::before{content:'';width:32px;height:32px;border:3px solid #4a4f5c;border-radius:6px;flex:none}
+.chk p.on{color:var(--w)}
+.chk p.on::before{border-color:var(--g);background:var(--g) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12l5 5 9-10' stroke='%2307080c' stroke-width='3.5' fill='none'/%3E%3C/svg%3E") center/80% no-repeat}
+.tag{position:absolute;font:800 28px Inter;text-transform:uppercase;padding:10px 20px;border:2.5px solid currentColor;border-radius:8px;background:rgba(7,9,14,.9);opacity:0}
+/* chat */
+.phone{position:absolute;left:250px;top:250px;width:580px;height:960px;border:12px solid #1b1e25;border-radius:64px;background:#0b0d12;overflow:hidden}
+.phone .top{display:flex;justify-content:space-between;padding:26px 44px 0;font:600 24px 'JetBrains Mono';color:#aab}
+.phone .who{display:flex;gap:18px;align-items:center;padding:26px 30px 20px;border-bottom:1px solid #1d212a}
+.av{width:68px;height:68px;border-radius:50%;background:#2c3550;display:grid;place-items:center;font:800 32px Inter}
+.who b{font:700 32px Inter;display:block}.who small{font:400 21px Inter;color:#7d8394}
+.msgs{padding:20px 26px;display:flex;flex-direction:column;gap:16px}
+.day{align-self:center;font:500 19px 'JetBrains Mono';color:#6d7384;margin:6px 0}
+.vm{align-self:flex-start;display:flex;align-items:center;gap:14px;padding:16px 22px;border-radius:24px;background:#1b2030;border:3px solid transparent}
+.vm .pl{width:42px;height:42px;border-radius:50%;background:#3d4a6e;display:grid;place-items:center}
+.vm .pl::after{content:'';border-left:15px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px}
+.vm .wv{display:flex;gap:4px;align-items:center;height:40px}
+.vm .wv i{width:5px;border-radius:3px;background:#8fa0c8}
+.vm em{font:500 20px 'JetBrains Mono';color:#9aa;font-style:normal}
+.tx{align-self:flex-start;max-width:420px;padding:18px 24px;border-radius:24px;background:#1b2030;font:500 31px/1.3 Inter;opacity:0}
+.tx small{display:block;text-align:right;font:400 18px 'JetBrains Mono';color:#7d8394;margin-top:4px}
+/* end */
+.endt{position:absolute;left:0;right:0;text-align:center}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="bg" width="1080" height="1920"></canvas>
+  <div id="ship" style="position:absolute;left:-360px;top:-640px;width:1800px;height:1240px;border-radius:50%;opacity:0;background:radial-gradient(ellipse at 50% 50%,#05060a 0 64%,rgba(5,6,10,.7) 69%,rgba(5,6,10,0) 72%)"><div style="position:absolute;left:8%;right:8%;bottom:9%;height:46%;border-radius:50%;border-bottom:6px dotted rgba(62,230,255,.45)"></div></div>
+  <div id="dawn" style="position:absolute;inset:0;opacity:0;background:linear-gradient(#1b2740 0%,#3a3550 45%,#8a5a4a 72%,#c98a55 85%,#2a2230 100%)"></div>
+  <div id="scenes"></div>
+  <div id="vig"></div>
+  <canvas id="grain" width="540" height="960" style="width:1080px;height:1920px;opacity:.07;mix-blend-mode:screen"></canvas>
+  <div id="hud"><span id="clock"></span></div>
+  <div id="cap"></div>
+  <div id="flash"></div>
+</div>
+<script>
+'use strict';
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const lerp=(a,b,p)=>a+(b-a)*p;
+const eo=p=>1-Math.pow(1-clamp(p),3);
+const eio=p=>{p=clamp(p);return p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2};
+const bo=p=>{p=clamp(p);const c1=1.6,c3=c1+1;return 1+c3*Math.pow(p-1,3)+c1*Math.pow(p-1,2)};
+const pr=(t,a,d=.5)=>clamp((t-a)/d);
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function el(tag,cls,parent,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;if(parent)parent.appendChild(e);return e}
+function plaque(parent,x,y,col,title,sub){const d=el('div','plq '+col,parent,`<i></i><div><b>${title}</b>${sub?`<small>${sub}</small>`:''}</div>`);d.style.left=x+'px';d.style.top=y+'px';return d}
+function pop(e,t,at,out){const p=pr(t,at,.45),s=bo(p);let o=clamp(p*3);if(out!=null)o*=1-pr(t,out,.3);e.style.opacity=o;e.style.transform=`translateY(${(1-s)*28}px) scale(${.86+.14*s})`}
+function flick(t,at){if(t<at)return 0;const d=t-at;if(d>.3)return 1;return [1,.15,.8,.1,1,.4,1][Math.floor(d*23)]??1}
+const pad=n=>String(n).padStart(2,'0');
+
+let WORDS=[],SC=[],TOTAL=0,VOICE_END=0;
+const norm=s=>s.toLowerCase().replace(/[^a-zа-яё0-9-]/g,'');
+function find(ph,after=0){const p=ph.split(' ').map(norm);for(let i=0;i<WORDS.length;i++){if(WORDS[i].t<after-.01)continue;let ok=true;for(let k=0;k<p.length;k++)if(!WORDS[i+k]||norm(WORDS[i+k].w)!==p[k]){ok=false;break}if(ok)return WORDS[i].t}throw new Error('нет якоря: '+ph)}
+function scene(start,clock,keys,build,update){SC.push({start,clock,keys,build,update})}
+
+const ALL_DARK=true, NO_CITY=true;
+const HOOK=(r,txt)=>{const h=el('div','abs',r,txt);h.style.cssText='left:70px;right:70px;top:300px;text-align:center;font:900 84px/1.05 Inter;text-transform:uppercase;color:#0a1a2a;opacity:0';return h};
+const hook=(h,t)=>{h.style.opacity=pr(t,0,.25)*(1-pr(t,2,.35));h.style.transform=`scale(${1.08-.08*eo(pr(t,0,.5))})`};
+const END=()=>scene('__END__',null,{},(r)=>{r.innerHTML=`<div class="endt" id="e1" style="top:560px;font:900 150px/1 Inter;letter-spacing:-2px">1 — 10 — 1</div><div class="endt" id="e2" style="top:760px;font:900 64px Inter;color:var(--c)">СОХРАНИ НА ЗИМУ</div><div class="endt" id="e3" style="top:880px;font:600 30px 'JetBrains Mono';color:var(--y);letter-spacing:2px">ВЫЖИВАНИЕ ПОСЛЕ… · ПОДПИШИСЬ</div>`},
+  (r,t,K,t0)=>{pop($('#e1',r),t,t0+.1);pop($('#e2',r),t,t0+.5);pop($('#e3',r),t,t0+.9)});
+const ICE='#cfe3ee', WATER='#0a1a2a';
+const ring=(id,col)=>`<svg class="abs" style="left:760px;top:260px" width="240" height="240"><circle cx="120" cy="120" r="96" fill="rgba(7,9,14,.85)" stroke="#2a2f3a" stroke-width="14"/><circle id="${id}" cx="120" cy="120" r="96" fill="none" stroke="${col}" stroke-width="14" stroke-dasharray="603" stroke-dashoffset="603" transform="rotate(-90 120 120)"/><text id="${id}t" x="120" y="134" text-anchor="middle" fill="#fff" font-family="JetBrains Mono" font-weight="700" font-size="40">0:00</text></svg>`;
+const setRing=(r,id,p,label)=>{$('#'+id,r).setAttribute('stroke-dashoffset',603*(1-p));$('#'+id+'t',r).textContent=label};
+
+/* ---------- 1. хруст ---------- */
+scene(0,'ЛЁД — 00:00',{rule:'запомни'},(r)=>{
+  r.innerHTML=`<svg class="abs" style="left:0;top:0" width="1080" height="1250"><rect x="0" y="250" width="1080" height="1000" fill="${ICE}"/>
+   <ellipse id="hole1" cx="540" cy="760" rx="0" ry="0" fill="${WATER}"/>
+   ${['M540 760 L380 600 L300 620','M540 760 L700 580 L760 500','M540 760 L760 860 L900 840','M540 760 L420 960 L330 1060','M540 760 L560 1000','M540 760 L520 520'].map(d=>`<path class="cr1" d="${d}" stroke="#5a7a8a" stroke-width="6" fill="none"/>`).join('')}
+   <g id="sp1"></g></svg>`;
+  HOOK(r,'Хруст. <span style="color:#c0392b">И ты уже в ледяной воде.</span>');
+  const b=el('div','abs',r,'1 — 10 — 1');b.id='big1';b.style.cssText='left:0;right:0;top:420px;text-align:center;font:900 170px Inter;color:#0a1a2a;opacity:0';
+},(r,t,K,t0)=>{$$('.cr1',r).forEach(p=>{const L=p.getTotalLength();p.style.strokeDasharray=L;p.style.strokeDashoffset=L*(1-eo(pr(t,.1,.5)))});
+  const h=eo(pr(t,.55,.5));$('#hole1',r).setAttribute('rx',230*h);$('#hole1',r).setAttribute('ry',130*h);
+  let s='';if(t>.6&&t<2)for(let i=0;i<14;i++){const a=i/14*Math.PI*2,d=(t-.6)*260;s+=`<circle cx="${540+Math.cos(a)*d}" cy="${760+Math.sin(a)*d*.5-(t-.6)*120+(t-.6)**2*140}" r="8" fill="#9fd3ff"/>`}$('#sp1',r).innerHTML=s;
+  r.style.transform=t>.5&&t<.8?`translate(${Math.sin(t*90)*10}px,0)`:'';hook(r.children[1],t);pop($('#big1',r),t,K.rule+.3)});
+SC[SC.length-1].self=true;
+
+/* ---------- 2. первая минута ---------- */
+scene('Первая минута','ЛЁД — 00:00',{shock:'шок',calm:'не дёргайся',head:'держи голову',breath:'восстанови'},(r)=>{
+  r.innerHTML=`<svg class="abs" style="left:0;top:0" width="1080" height="1250"><rect x="0" y="250" width="1080" height="1000" fill="${ICE}"/><ellipse cx="540" cy="760" rx="300" ry="190" fill="${WATER}"/>
+   <circle id="hd2" cx="540" cy="740" r="56" fill="#e0b090"/><rect x="485" y="700" width="110" height="34" rx="16" fill="#c0392b"/><g id="br2"></g><path d="M300 800 Q 540 830 780 800" stroke="#1f4a6a" stroke-width="5" fill="none"/></svg>${ring('rg2','#3ee6ff')}`;
+  plaque(r,90,280,'r','Холодовой шок','дыхание сбивается');plaque(r,90,1080,'c','Голову — над водой','дыши ровно');
+},(r,t,K,t0,t1)=>{setRing(r,'rg2',pr(t,t0,t1-t0),'0:'+pad(Math.min(59,Math.floor(pr(t,t0,t1-t0)*60))));
+  $('#hd2',r).setAttribute('cy',740+Math.sin(t*(t<K.calm?9:3))*(t<K.calm?8:3));
+  let b='';for(let k=0;k<3;k++){const ph=((t*(t<K.calm?1.6:.7)+k/3)%1);b+=`<circle cx="${590+ph*80}" cy="${700-ph*90}" r="${10+ph*30}" fill="rgba(255,255,255,${.6*(1-ph)})"/>`}$('#br2',r).innerHTML=b;
+  const [a,c]=$$('.plq',r);pop(a,t,K.shock);pop(c,t,K.head)});
+
+/* ---------- 3. десять минут: развернись ---------- */
+scene('Дальше у тебя','ЛЁД — 01:00',{ten:'десяти минут',turn:'развернись',held:'выдержал',elb:'локти'},(r)=>{
+  r.innerHTML=`<svg class="abs" style="left:0;top:0" width="1080" height="1250"><rect x="0" y="250" width="1080" height="1000" fill="${ICE}"/><ellipse cx="540" cy="900" rx="300" ry="190" fill="${WATER}"/>
+   ${[0,1,2,3,4,5].map(i=>`<ellipse class="fp3" cx="${510+(i%2)*60}" cy="${680-i*80}" rx="16" ry="28" fill="#8fb0c0"/>`).join('')}
+   <path id="ar3" d="M540 700 V340" stroke="#3dff8f" stroke-width="12" fill="none" marker-end="url(#ah3)"/><defs><marker id="ah3" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6Z" fill="#3dff8f"/></marker></defs>
+   <g id="me3"><circle cx="540" cy="860" r="50" fill="#e0b090"/><rect x="430" y="740" width="70" height="40" rx="16" fill="#c0392b"/><rect x="580" y="740" width="70" height="40" rx="16" fill="#c0392b"/></g></svg>${ring('rg3','#f5c542')}`;
+  plaque(r,90,280,'g','Назад — там лёд выдержал','по своим следам');plaque(r,90,1100,'y','Локти — на лёд','пока слушаются руки');
+},(r,t,K,t0,t1)=>{const p=pr(t,K.ten,t1-K.ten);setRing(r,'rg3',p,pad(10-Math.floor(p*3))+':00');
+  $$('.fp3',r).forEach((f,i)=>f.setAttribute('opacity',pr(t,K.turn+i*.08,.2)));$('#ar3',r).setAttribute('opacity',pr(t,K.turn+.3,.3));
+  $('#me3',r).setAttribute('transform',`rotate(${180-180*eio(pr(t,K.turn,.8))} 540 860)`);const [a,b]=$$('.plq',r);pop(a,t,K.held);pop(b,t,K.elb)});
+
+/* ---------- 4. выползай горизонтально (вид сбоку) ---------- */
+scene('Работай ногами','ЛЁД — 03:00',{kick:'работай',crawl:'выползай',hor:'горизонтально'},(r)=>{
+  r.innerHTML=`<svg class="abs" style="left:0;top:0" width="1080" height="1250"><rect x="0" y="760" width="1080" height="490" fill="${WATER}"/><rect x="560" y="720" width="520" height="70" fill="${ICE}"/>
+   <g id="bd4"><rect x="0" y="-36" width="320" height="72" rx="36" fill="#c0392b"/><circle cx="350" cy="0" r="46" fill="#e0b090"/><g id="lg4"><rect x="-150" y="-26" width="160" height="22" rx="11" fill="#2a3a5a"/><rect x="-150" y="6" width="160" height="22" rx="11" fill="#2a3a5a"/></g></g><g id="kw4"></g></svg>`;
+  plaque(r,90,300,'c','Горизонтально · животом','ноги работают, как в плавании');
+},(r,t,K,t0)=>{const p=eio(pr(t,K.crawl,2.2));const x=lerp(210,640,p),y=lerp(770,686,p);$('#bd4',r).setAttribute('transform',`translate(${x} ${y})`);
+  $('#lg4',r).setAttribute('transform',`rotate(${Math.sin(t*14)*10} 0 0)`);let w='';for(let k=0;k<3;k++){const ph=((t*1.5+k/3)%1);w+=`<circle cx="${x-170}" cy="${y}" r="${20+ph*80}" fill="none" stroke="#9fd3ff" stroke-width="3" opacity="${1-ph}"/>`}$('#kw4',r).innerHTML=t>K.kick?w:'';pop($('.plq',r),t,K.hor)});
+
+/* ---------- 5. не вставай, катись, к берегу ---------- */
+scene('Не вставай','ЛЁД — 04:00',{roll:'откатись',crawl:'ползи',warm:'в тепло',hour:'около часа',save:'сохрани'},(r)=>{
+  r.innerHTML=`<svg class="abs" style="left:0;top:0" width="1080" height="1250"><rect x="0" y="250" width="1080" height="1000" fill="${ICE}"/><rect x="0" y="250" width="1080" height="160" fill="#4a6a4a"/><text x="540" y="345" text-anchor="middle" fill="#dfe" font-family="Inter" font-weight="800" font-size="40">БЕРЕГ</text>
+   <ellipse cx="540" cy="1040" rx="200" ry="120" fill="${WATER}"/><path id="pt5" d="M640 950 L 760 860 L 700 700 L 560 460" stroke="#3a5a6a" stroke-width="8" stroke-dasharray="16 14" fill="none"/>
+   <g id="me5"><rect x="-70" y="-26" width="140" height="52" rx="26" fill="#c0392b"/><circle cx="90" cy="0" r="30" fill="#e0b090"/></g></svg>`;
+  const b=el('div','abs',r,'<div style="font:600 24px JetBrains Mono;letter-spacing:3px;color:var(--r)">ПРАВИЛО</div><div style="font:900 80px/1 Inter;margin-top:8px">НЕ ВСТАВАЙ</div>');b.id='rl5';b.style.cssText='left:90px;right:90px;top:520px;text-align:center;padding:26px 0;border:4px solid var(--r);border-radius:16px;background:rgba(14,6,8,.93);opacity:0';
+  plaque(r,90,1140,'r','До переохлаждения ≈ 1 час','сразу в тепло');
+},(r,t,K,t0,t1)=>{pop($('#rl5',r),t,t0,K.roll);const P=$('#pt5',r),L=P.getTotalLength();const q=eio(pr(t,K.roll,t1-K.roll-.5));const pt=P.getPointAtLength(L*q);
+  $('#me5',r).setAttribute('transform',`translate(${pt.x} ${pt.y}) rotate(${t<K.crawl?q*720:-60})`);pop($('.plq',r),t,K.hour)});
+
+END();
+function EXTRA(t){$('#ship').style.opacity=0;const d=$('#dawn');d.style.background='linear-gradient(#9fb8c8 0%,#dfeaf0 55%,#0e1a26 66%,#0a1420 100%)';d.style.opacity=t>=SC[SC.length-1].t0?0:1}
+
+const ACC=[['y','один','десять','первая минута','десяти минут','около часа'],
+ ['r','холодовой шок','не вставай','не дёргайся'],
+ ['g','там лёд выдержал','локти на лёд','горизонтально','сохрани']];
+const NUM=[['один','1'],['десять','10'],['десяти минут','10 минут']];
+
+let CHUNKS=[];
+function buildCaps(){
+  const W=WORDS.map(w=>({...w,n:norm(w.w),c:'w'}));
+  const match=(i,ph)=>ph.every((p,k)=>W[i+k]&&W[i+k].n===p);
+  for(const [col,...phs] of ACC)for(const ph of phs){const p=ph.split(' ');for(let i=0;i<W.length;i++)if(match(i,p))for(let k=0;k<p.length;k++)W[i+k].c=col}
+  const toks=[];
+  for(let i=0;i<W.length;i++){
+    if(W[i].w==='—')continue;
+    const m=NUM.find(([ph])=>match(i,ph.split(' ')));
+    if(m){const n=m[0].split(' ').length;const last=W[i+n-1].w;toks.push({d:m[1]+(last.match(/[.,!?:»]+$/)||[''])[0],t:W[i].t,e:W[i+n-1].e,c:W[i].c==='w'?'y':W[i].c,brk:/[.!?:»]$/.test(last),com:/,$/.test(last)});i+=n-1;continue}
+    toks.push({d:W[i].w,t:W[i].t,e:W[i].e,c:W[i].c,brk:/[.!?:»]$/.test(W[i].w),com:/,$/.test(W[i].w)});
+  }
+  let cur=[];const flush=()=>{if(cur.length)CHUNKS.push(cur);cur=[]};
+  for(const k of toks){const len=cur.reduce((a,x)=>a+x.d.length+1,0);if(cur.length&&(cur.length>=4||len+k.d.length>22))flush();cur.push(k);if(k.brk||(k.com&&cur.length>=2))flush()}
+  flush();
+}
+const cap=document.getElementById('cap');let lastChunk=-1;
+function drawCaps(t){
+  let idx=-1;for(let i=0;i<CHUNKS.length;i++){if(CHUNKS[i][0].t<=t)idx=i;else break}
+  if(idx>=0){const ch=CHUNKS[idx],next=CHUNKS[idx+1];const until=Math.min(next?next[0].t:1e9,ch[ch.length-1].e+1.2);if(t>until)idx=-1}
+  if(idx!==lastChunk){cap.innerHTML=idx<0?'':CHUNKS[idx].map(k=>`<span class="${k.c}">${k.d.replace(/[«»]/g,'').replace(/^—$/,'')}</span>`).join('');lastChunk=idx}
+  if(idx>=0)CHUNKS[idx].forEach((k,i)=>{const s=cap.children[i],p=pr(t,k.t-.04,.16);s.style.opacity=t<k.t-.04?.0:1;s.style.transform=`translateY(${(1-eo(p))*14}px) scale(${.92+.08*bo(p)})`});
+}
+
+/* ---------- фон: город гаснет ---------- */
+const bg=document.getElementById('bg').getContext('2d');let WIN=[],STARS=[];
+function initBg(){const R=rng(11);
+  for(let i=0;i<140;i++)STARS.push([R()*1080,R()*1300,R()*1.6+.4,R()]);
+  let x=-20;while(x<1100){const w=60+R()*110,h=180+R()*330,top=1920-h;for(let yy=top+16;yy<1910;yy+=22)for(let xx=x+10;xx<x+w-10;xx+=18)if(R()<.42)WIN.push([xx,yy,R(),R()<.12]);WIN.push([x,top,w,h,'b']);x+=w+6+R()*12}}
+function drawBg(t){bg.fillStyle='#07080c';bg.fillRect(0,0,1080,1920);
+  const g=bg.createLinearGradient(0,900,0,1920);g.addColorStop(0,'rgba(20,40,70,0)');g.addColorStop(1,'rgba(30,60,110,.25)');bg.fillStyle=g;bg.fillRect(0,900,1080,1020);
+  for(const [x,y,r,ph] of STARS){bg.globalAlpha=.25+.25*Math.sin(t*1.3+ph*20);bg.fillStyle='#cfe0ff';bg.fillRect(x,y,r,r)}bg.globalAlpha=1;
+  if(typeof NO_CITY==='undefined')for(const b of WIN)if(b[4]==='b'){bg.fillStyle='#0b0d13';bg.fillRect(b[0],b[1],b[2],b[3])}
+  const k=typeof ALL_DARK!=='undefined'?1.2:window.BLACKOUT!=null?(t>window.BLACKOUT?1.2:0):clamp(t/VOICE_END);
+  if(typeof NO_CITY==='undefined')for(const w of WIN)if(w[4]!=='b'){if(w[2]<k*.85)continue;bg.fillStyle=w[3]?'rgba(62,230,255,.55)':'rgba(214,160,70,.55)';bg.fillRect(w[0],w[1],8,10)}
+}
+const gr=document.getElementById('grain').getContext('2d');const GI=gr.createImageData(540,960);
+function drawGrain(t){const R=rng(Math.floor(t*30)+1);for(let i=0;i<GI.data.length;i+=4){const v=R()*255;GI.data[i]=GI.data[i+1]=GI.data[i+2]=v;GI.data[i+3]=255}gr.putImageData(GI,0,0)}
+
+/* ---------- запуск ---------- */
+window.setup=function(words,voiceEnd){
+  WORDS=words;VOICE_END=voiceEnd;const host=document.getElementById('scenes');let prev=0;
+  SC.forEach((s,i)=>{s.t0=s.start===0?0:s.start==='__END__'?voiceEnd+.5:find(s.start,prev);prev=s.t0;s.K={};let after=s.t0;for(const [k,ph] of Object.entries(s.keys)){s.K[k]=find(ph,after);after=s.K[k]+.02}s.root=el('div','scene',host);s.build(s.root)});
+  SC.forEach((s,i)=>s.t1=SC[i+1]?SC[i+1].t0:voiceEnd+3.4);TOTAL=SC[SC.length-1].t1;
+  initBg();buildCaps();return TOTAL;
+};
+window.renderAt=function(t){
+  drawBg(t);drawGrain(t);if(typeof EXTRA==='function')EXTRA(t);
+  let clock=null,flash=0;
+  SC.forEach((s,i)=>{const vis=t>=s.t0-.3&&t<s.t1+.3;s.root.style.display=vis?'block':'none';if(!vis)return;
+    const fi=i==0?1:pr(t,s.t0-.12,.25),fo=1-pr(t,s.t1-.12,.25);s.root.style.opacity=Math.min(fi,fo);
+    s.update(s.root,t,s.K,s.t0,s.t1);
+    if(!s.self){const z=1+.04*pr(t,s.t0,s.t1-s.t0);s.root.style.transform=`scale(${z*(1+.03*(1-eo(pr(t,s.t0-.12,.5))))})`}
+    if(t>=s.t0&&t<s.t1){clock=s.clock;if(i>0)flash=Math.max(flash,.1*(1-pr(t,s.t0,.18)))}});
+  const ck=document.getElementById('clock');ck.style.display=clock?'inline-block':'none';if(clock)ck.textContent=clock.includes('—')?clock:`ДЕНЬ 1 — ${clock}`;
+  document.getElementById('flash').style.opacity=flash;
+  drawCaps(t>VOICE_END+.4?-1:t);
+};
+</script>
+</body>
+</html>
