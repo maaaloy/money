@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>02 — Не отвечай</title>
+<style>
+:root{--bg:#07080c;--y:#f5c542;--r:#ff3b3b;--c:#3ee6ff;--g:#3dff8f;--gr:#8a8f9c;--w:#f2f4f8}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1920px;background:var(--bg);overflow:hidden}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:Inter,sans-serif;color:var(--w)}
+#bg,#grain{position:absolute;inset:0}
+.scene{position:absolute;inset:0;opacity:0;transform-origin:540px 720px}
+#hud{position:absolute;top:150px;left:0;right:0;text-align:center}
+#clock{display:inline-block;font:700 30px 'JetBrains Mono',monospace;color:var(--y);background:rgba(20,18,8,.85);border:2px solid rgba(245,197,66,.35);padding:8px 20px;border-radius:6px;letter-spacing:1px}
+#cap{position:absolute;left:70px;right:70px;top:1290px;text-align:center;font:900 76px/1.04 Inter,sans-serif;text-transform:uppercase;letter-spacing:-1px}
+#cap span{display:inline-block;margin:0 .13em;text-shadow:0 4px 18px rgba(0,0,0,.9),0 0 2px #000}
+#vig{position:absolute;inset:0;background:radial-gradient(ellipse 80% 65% at 50% 42%,transparent 50%,rgba(0,0,0,.75) 100%),repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 2px,transparent 2px 4px);pointer-events:none}
+#flash{position:absolute;inset:0;background:#fff;opacity:0}
+.abs{position:absolute}
+.plq{position:absolute;display:flex;gap:16px;align-items:center;padding:14px 22px 14px 16px;border:3px solid currentColor;border-radius:10px;background:rgba(7,9,14,.88);box-shadow:0 0 26px -4px currentColor,inset 0 0 18px -8px currentColor;opacity:0;white-space:nowrap}
+.plq i{width:34px;height:34px;border:2.5px solid currentColor;border-radius:6px;display:grid;place-items:center;font:900 22px Inter;font-style:normal}
+.plq i::after{content:'!'}
+.plq.c i::after,.plq.g i::after{content:'i'}
+.plq b{display:block;font:800 34px/1.1 Inter;color:var(--w);text-transform:uppercase}
+.plq small{display:block;font:500 19px 'JetBrains Mono',monospace;color:currentColor;opacity:.85;margin-top:3px;text-transform:uppercase}
+.y{color:var(--y)}.r{color:var(--r)}.c{color:var(--c)}.g{color:var(--g)}.gr{color:var(--gr)}
+.mono{font-family:'JetBrains Mono',monospace}
+/* s1 */
+.dev{position:absolute}
+.tv{left:150px;top:290px;width:780px;height:460px;border:10px solid #1a1d24;border-radius:14px;background:#050608}
+.tv .stand{position:absolute;left:330px;bottom:-56px;width:100px;height:46px;background:#14161c;border-radius:0 0 8px 8px}
+.ph{left:170px;top:830px;width:260px;height:420px;border:9px solid #1a1d24;border-radius:36px;background:#050608}
+.spk{left:660px;top:880px;width:230px;height:330px;border-radius:40px;background:linear-gradient(90deg,#15171d,#22252d 50%,#15171d)}
+.scr{position:absolute;inset:0;border-radius:inherit;overflow:hidden;opacity:0;background:radial-gradient(ellipse at 50% 40%,#5a0b10,#22050a 75%);box-shadow:inset 0 0 60px rgba(255,59,59,.35)}
+.scrc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+.hdr{font:600 22px 'JetBrains Mono';color:#ff8a8a;letter-spacing:2px}
+.big{font:900 84px/1 Inter;color:#fff;text-shadow:0 0 30px rgba(255,59,59,.8)}
+.big.sm{font-size:40px;padding:0 16px}
+.ring{position:absolute;left:25px;right:25px;top:18px;height:26px;border-radius:13px;background:#2a2d35}
+.mesh{position:absolute;left:22px;right:22px;top:70px;bottom:80px;background:radial-gradient(circle,#0b0c10 2.5px,transparent 3px) 0 0/16px 16px}
+.led{position:absolute;left:24px;right:24px;bottom:22px;height:40px;border-radius:6px;background:#080809;overflow:hidden;font:700 24px/40px 'JetBrains Mono';color:var(--r);white-space:nowrap}
+.led span{display:inline-block}
+/* bars / generic */
+.bar{position:absolute;height:26px;border:3px solid currentColor;border-radius:8px;overflow:hidden}
+.bar>div{height:100%;background:currentColor;width:0}
+.chk{position:absolute;left:150px;width:780px;padding:22px 28px;border:2px solid #2a2f3a;border-radius:12px;background:rgba(10,12,18,.9)}
+.chk h4{font:600 20px 'JetBrains Mono';color:var(--y);letter-spacing:2px;margin-bottom:12px}
+.chk p{font:800 32px/1.55 Inter;text-transform:uppercase;color:#6b7080;display:flex;align-items:center;gap:16px}
+.chk p::before{content:'';width:32px;height:32px;border:3px solid #4a4f5c;border-radius:6px;flex:none}
+.chk p.on{color:var(--w)}
+.chk p.on::before{border-color:var(--g);background:var(--g) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12l5 5 9-10' stroke='%2307080c' stroke-width='3.5' fill='none'/%3E%3C/svg%3E") center/80% no-repeat}
+.tag{position:absolute;font:800 28px Inter;text-transform:uppercase;padding:10px 20px;border:2.5px solid currentColor;border-radius:8px;background:rgba(7,9,14,.9);opacity:0}
+/* chat */
+.phone{position:absolute;left:250px;top:250px;width:580px;height:960px;border:12px solid #1b1e25;border-radius:64px;background:#0b0d12;overflow:hidden}
+.phone .top{display:flex;justify-content:space-between;padding:26px 44px 0;font:600 24px 'JetBrains Mono';color:#aab}
+.phone .who{display:flex;gap:18px;align-items:center;padding:26px 30px 20px;border-bottom:1px solid #1d212a}
+.av{width:68px;height:68px;border-radius:50%;background:#2c3550;display:grid;place-items:center;font:800 32px Inter}
+.who b{font:700 32px Inter;display:block}.who small{font:400 21px Inter;color:#7d8394}
+.msgs{padding:20px 26px;display:flex;flex-direction:column;gap:16px}
+.day{align-self:center;font:500 19px 'JetBrains Mono';color:#6d7384;margin:6px 0}
+.vm{align-self:flex-start;display:flex;align-items:center;gap:14px;padding:16px 22px;border-radius:24px;background:#1b2030;border:3px solid transparent}
+.vm .pl{width:42px;height:42px;border-radius:50%;background:#3d4a6e;display:grid;place-items:center}
+.vm .pl::after{content:'';border-left:15px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px}
+.vm .wv{display:flex;gap:4px;align-items:center;height:40px}
+.vm .wv i{width:5px;border-radius:3px;background:#8fa0c8}
+.vm em{font:500 20px 'JetBrains Mono';color:#9aa;font-style:normal}
+.tx{align-self:flex-start;max-width:420px;padding:18px 24px;border-radius:24px;background:#1b2030;font:500 31px/1.3 Inter;opacity:0}
+.tx small{display:block;text-align:right;font:400 18px 'JetBrains Mono';color:#7d8394;margin-top:4px}
+/* end */
+.endt{position:absolute;left:0;right:0;text-align:center}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="bg" width="1080" height="1920"></canvas>
+  <div id="scenes"></div>
+  <div id="vig"></div>
+  <canvas id="grain" width="540" height="960" style="width:1080px;height:1920px;opacity:.07;mix-blend-mode:screen"></canvas>
+  <div id="hud"><span id="clock"></span></div>
+  <div id="cap"></div>
+  <div id="flash"></div>
+</div>
+<script>
+'use strict';
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const lerp=(a,b,p)=>a+(b-a)*p;
+const eo=p=>1-Math.pow(1-clamp(p),3);
+const eio=p=>{p=clamp(p);return p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2};
+const bo=p=>{p=clamp(p);const c1=1.6,c3=c1+1;return 1+c3*Math.pow(p-1,3)+c1*Math.pow(p-1,2)};
+const pr=(t,a,d=.5)=>clamp((t-a)/d);
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function el(tag,cls,parent,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;if(parent)parent.appendChild(e);return e}
+function plaque(parent,x,y,col,title,sub){const d=el('div','plq '+col,parent,`<i></i><div><b>${title}</b>${sub?`<small>${sub}</small>`:''}</div>`);d.style.left=x+'px';d.style.top=y+'px';return d}
+function pop(e,t,at,out){const p=pr(t,at,.45),s=bo(p);let o=clamp(p*3);if(out!=null)o*=1-pr(t,out,.3);e.style.opacity=o;e.style.transform=`translateY(${(1-s)*28}px) scale(${.86+.14*s})`}
+function flick(t,at){if(t<at)return 0;const d=t-at;if(d>.3)return 1;return [1,.15,.8,.1,1,.4,1][Math.floor(d*23)]??1}
+const pad=n=>String(n).padStart(2,'0');
+
+let WORDS=[],SC=[],TOTAL=0,VOICE_END=0;
+const norm=s=>s.toLowerCase().replace(/[^a-zа-яё0-9-]/g,'');
+function find(ph,after=0){const p=ph.split(' ').map(norm);for(let i=0;i<WORDS.length;i++){if(WORDS[i].t<after-.01)continue;let ok=true;for(let k=0;k<p.length;k++)if(!WORDS[i+k]||norm(WORDS[i+k].w)!==p[k]){ok=false;break}if(ok)return WORDS[i].t}throw new Error('нет якоря: '+ph)}
+function scene(start,clock,keys,build,update){SC.push({start,clock,keys,build,update})}
+
+const DOOR=`<div class="abs" id="dr" style="left:280px;top:250px;width:520px;height:980px;border-radius:8px;background:linear-gradient(90deg,#1f1812,#2c2219 50%,#1f1812);border:6px solid #120e0a">
+   <div style="position:absolute;left:30px;right:30px;top:40px;height:420px;border:3px solid rgba(0,0,0,.4);border-radius:6px"></div>
+   <div style="position:absolute;left:30px;right:30px;top:500px;height:430px;border:3px solid rgba(0,0,0,.4);border-radius:6px"></div>
+   <div class="eye" style="position:absolute;left:236px;top:130px;width:44px;height:44px;border-radius:50%;background:radial-gradient(#aaa,#333)"></div>
+   <div style="position:absolute;right:46px;top:520px;width:110px;height:22px;border-radius:11px;background:#b9b3a8"></div>
+   <svg style="position:absolute;left:340px;top:330px" width="160" height="120"><path d="M10 10 Q 70 110 140 30" stroke="#d6cfc2" stroke-width="7" stroke-dasharray="14 9" fill="none"/></svg></div>
+  <div class="abs lightL" style="left:286px;top:1226px;width:508px;height:10px;border-radius:5px;background:#ffd89a;box-shadow:0 0 30px 8px rgba(255,200,120,.6)"></div>
+  <div class="abs gap" style="left:420px;top:1222px;width:70px;height:18px;background:#07080c"></div>
+  <div class="abs gap" style="left:560px;top:1222px;width:70px;height:18px;background:#07080c"></div>
+  <svg class="abs rings" style="left:0;top:0" width="1080" height="1250"></svg>`;
+function doorFx(r,t,talk,col='#ff3b3b'){
+  const fl=.75+.25*Math.sin(t*13)*Math.sin(t*7.3);$('.lightL',r).style.opacity=fl;
+  let h='';if(talk)for(let k=0;k<3;k++){const ph=((t*1.2+k/3)%1);h+=`<ellipse cx="540" cy="1230" rx="${80+ph*420}" ry="${30+ph*160}" fill="none" stroke="${col}" stroke-width="4" opacity="${(1-ph)*.7}"/>`}
+  $('.rings',r).innerHTML=h;
+}
+const fig=c=>`<svg width="100%" height="100%" viewBox="0 0 150 190"><circle cx="75" cy="55" r="38" fill="${c}"/><path d="M8 190 C 8 120, 40 100, 75 100 C 110 100, 142 120, 142 190Z" fill="${c}"/></svg>`;
+
+/* ---------- 1. голос за дверью ---------- */
+scene(0,'05:06',{rule:'не отвечайте'},(r)=>{
+  r.innerHTML=DOOR;
+  plaque(r,250,262,'r','Голос: совпадение 98%','за дверью · кв. 28');
+  const big=el('div','abs',r,'<div style="font:600 24px JetBrains Mono;letter-spacing:3px;color:var(--r)">ПРАВИЛО №1</div><div style="font:900 92px/1 Inter;margin-top:8px">НЕ ОТВЕЧАТЬ</div>');
+  big.style.cssText='left:90px;right:90px;top:560px;text-align:center;padding:34px 0;border:4px solid var(--r);border-radius:16px;background:rgba(20,4,6,.92);box-shadow:0 0 60px rgba(255,59,59,.45);opacity:0';
+},(r,t,K,t0)=>{
+  doorFx(r,t,t<K.rule);pop($('.plq',r),t,t0+.4);pop(r.lastElementChild,t,K.rule);
+});
+
+/* ---------- 2. что он говорит ---------- */
+scene('Он будет просить','05:07',{name:'назовёт',keys:'ключи',nine:'девять'},(r)=>{
+  r.innerHTML=`<div class="abs" style="left:110px;top:260px;width:860px;padding:30px 34px;border:2px solid #2a2f3a;border-radius:14px;background:rgba(10,12,18,.92)">
+   <div style="font:600 22px JetBrains Mono;color:var(--r);letter-spacing:3px;margin-bottom:18px">● ЗА ДВЕРЬЮ · РАСШИФРОВКА</div>
+   <p class="ln">«Открой. Это я. Мне холодно».</p><p class="ln">«<span style="color:var(--y)">[ваше имя]</span>, открой».</p><p class="ln">«Ключи — на полке у зеркала».</p></div>
+   <div class="abs" id="f9" style="left:110px;top:800px;width:860px;display:flex;gap:16px;height:150px"></div>
+   <div class="abs" id="t9" style="left:110px;top:980px;width:860px;text-align:center;font:800 30px JetBrains Mono;color:var(--r);letter-spacing:2px;opacity:0">9 ИЗ 10 ОТВЕЧАЮТ НА 3-Й ФРАЗЕ</div>`;
+  $$('.ln',r).forEach(p=>p.style.cssText='font:700 44px/1.5 Inter;opacity:0');
+  for(let i=0;i<10;i++)el('div','',$('#f9',r),fig('#3a3f4c')).style.cssText='flex:1;opacity:0';
+},(r,t,K,t0)=>{
+  const [a,b,c]=$$('.ln',r);pop(a,t,t0+.1);pop(b,t,K.name);pop(c,t,K.keys);
+  $$('#f9>div',r).forEach((f,i)=>{f.style.opacity=pr(t,K.nine-.4+i*.04,.3);const red=i!=6&&t>K.nine+.3+i*.08;$$('path,circle',f).forEach(e=>e.setAttribute('fill',red?'#ff3b3b':i==6?'#3dff8f':'#3a3f4c'))});
+  $('#t9',r).style.opacity=pr(t,K.nine,.3);
+});
+
+/* ---------- 3. образец голоса ---------- */
+scene('Каждое','05:08',{four:'четыре секунды',ans:'ответите'},(r)=>{
+  r.innerHTML=`<div class="abs" id="wv3" style="left:140px;top:330px;width:800px;height:220px;display:flex;gap:7px;align-items:center;justify-content:center"></div>
+  <div class="abs mono" style="left:140px;top:620px;width:800px;font:600 24px JetBrains Mono;color:var(--r);letter-spacing:2px">ОБРАЗЕЦ ВАШЕГО ГОЛОСА<span id="s3n" style="float:right">0 С</span></div>
+  <div class="abs" style="left:140px;top:670px;width:800px;height:70px;border:3px solid #3a3f4c;border-radius:10px;overflow:hidden">
+   <div id="b3a" style="position:absolute;left:0;top:0;bottom:0;width:0;background:var(--r)"></div>
+   <div id="b3b" style="position:absolute;left:0;top:0;bottom:0;width:0;background:repeating-linear-gradient(45deg,rgba(255,59,59,.45) 0 14px,transparent 14px 28px)"></div></div>
+  <div class="abs mono" style="left:140px;top:755px;width:800px;display:flex;justify-content:space-between;font:500 20px JetBrains Mono;color:#6b7080"><span>0</span><span>10</span><span>20</span><span>30</span><span>40 С</span></div>`;
+  for(let i=0;i<54;i++)el('i','',$('#wv3',r)).style.cssText='width:8px;border-radius:4px;background:#ff3b3b;height:10px';
+  plaque(r,140,860,'r','Ответите — будет 40 с','каждое слово = новый образец');
+},(r,t,K,t0)=>{
+  $$('#wv3 i',r).forEach((e,i)=>{const a=Math.abs(Math.sin(t*7+i*.6)*Math.sin(t*2.7+i*.23));e.style.height=(10+180*a)+'px'});
+  const a=eo(pr(t,K.four,.8))*4,b=t>K.ans?4+eo(pr(t,K.ans,1.4))*36:0;
+  $('#b3a',r).style.width=a/40*100+'%';$('#b3b',r).style.width=b/40*100+'%';
+  $('#s3n',r).textContent=(t>K.ans?Math.round(b):a.toFixed(1))+' С';
+  pop($('.plq',r),t,K.ans+.4);
+});
+
+/* ---------- 4. глазок ---------- */
+scene('Второе','05:09',{no:'не смотрите',shadow:'тень',cam:'звонок',tape:'заклейте'},(r)=>{
+  const door=(x,c)=>`<div class="abs" style="left:${x}px;top:330px;width:340px;height:760px;border-radius:6px;background:linear-gradient(90deg,${c});border:5px solid #120e0a"></div>`;
+  r.innerHTML=`<div class="abs" style="left:0;right:0;top:1090px;height:4px;background:#2a2f3a"></div>
+  ${door(110,'#1f1812,#2c2219 50%,#1f1812')}${door(630,'#191b20,#24272e 50%,#191b20')}
+  <div class="abs" style="left:110px;top:290px;width:340px;text-align:center;font:600 22px JetBrains Mono;color:var(--g)">ВАША · КВ. 28</div>
+  <div class="abs" style="left:630px;top:290px;width:340px;text-align:center;font:600 22px JetBrains Mono;color:#6b7080">КВ. 27</div>
+  <div class="abs" id="eye4" style="left:254px;top:440px;width:52px;height:52px;border-radius:50%;background:radial-gradient(#ffe9b8,#c9922e);box-shadow:0 0 30px #ffd89a"></div>
+  <div class="abs" id="tape4" style="left:226px;top:446px;width:110px;height:40px;background:rgba(210,200,170,.95);transform:rotate(-12deg);opacity:0"></div>
+  <div class="abs" id="cam4" style="left:900px;top:620px;width:56px;height:110px;border-radius:14px;background:#0d0f14;border:3px solid #3a3f4c"><div style="margin:12px auto;width:28px;height:28px;border-radius:50%;background:radial-gradient(#3ee6ff,#0a3a45)"></div><div class="rec" style="margin:0 auto;width:12px;height:12px;border-radius:50%;background:#ff3b3b"></div></div>
+  <svg class="abs" style="left:0;top:0" width="1080" height="1200"><path id="fov4" d="M928 660 L 420 520 L 420 760 Z" fill="rgba(62,230,255,.12)" stroke="#3ee6ff" stroke-width="2" stroke-dasharray="8 8"/></svg>`;
+  plaque(r,90,560,'r','Тень в глазке видна','с площадки');
+  plaque(r,560,780,'c','Звонок с камерой','кв. 27 · запись идёт');
+  plaque(r,90,560,'g','Глазок: заклеен','изнутри');
+},(r,t,K,t0)=>{
+  const sh=t>K.shadow&&t<K.tape;const e=$('#eye4',r);e.style.background=sh?'radial-gradient(#3a2a1a,#120c08)':'radial-gradient(#ffe9b8,#c9922e)';e.style.boxShadow=sh?'none':'0 0 30px #ffd89a';
+  $('#tape4',r).style.opacity=pr(t,K.tape+.2,.3);
+  $('.rec',r).style.opacity=Math.sin(t*6)>0?1:.2;
+  $('#fov4',r).style.opacity=pr(t,K.cam,.4);$('#cam4',r).style.boxShadow=t>K.cam?'0 0 30px rgba(62,230,255,.5)':'none';
+  const [a,b,c]=$$('.plq',r);pop(a,t,K.shadow,K.tape);pop(b,t,K.cam);pop(c,t,K.tape+.4);
+});
+
+/* ---------- 5. ванная ---------- */
+scene('Третье','05:10',{go:'уходите',no:'нет окон',tile:'кафель',water:'воду',meter:'счётчик'},(r)=>{
+  r.innerHTML=`<svg class="abs" style="left:0;top:0" width="1080" height="1250">
+   <g stroke="#3ee6ff" stroke-width="5" fill="none" opacity=".7"><rect x="130" y="290" width="820" height="840"/><path d="M560 290 V600 M560 690 V1130 M130 700 H300 M380 700 H560 M560 820 H700 M790 820 H950"/></g>
+   <g fill="#ff3b3b"><rect x="230" y="282" width="150" height="16"/><rect x="700" y="282" width="150" height="16"/><rect x="122" y="850" width="16" height="150"/><rect x="942" y="380" width="16" height="140"/></g>
+   <g class="devs" fill="#3ee6ff"><circle cx="250" cy="420" r="14"/><circle cx="460" cy="620" r="14"/><circle cx="820" cy="470" r="14"/><circle cx="660" cy="1040" r="14"/><circle cx="220" cy="1050" r="14"/></g>
+   <rect id="bath5" x="565" y="825" width="380" height="300" fill="rgba(61,255,143,.12)" stroke="#3dff8f" stroke-width="5"/>
+   <path id="path5" d="M560 645 L 470 645 L 470 760 L 745 760 L 745 900" stroke="#3dff8f" stroke-width="6" fill="none" stroke-dasharray="14 10"/>
+   <g id="tile5" stroke="rgba(61,255,143,.35)" stroke-width="2">${[...Array(7)].map((_,i)=>`<path d="M${600+i*50} 825 V1125"/>`).join('')}${[...Array(5)].map((_,i)=>`<path d="M565 ${860+i*55} H945"/>`).join('')}</g>
+   <text x="755" y="980" text-anchor="middle" fill="#3dff8f" font-family="Inter" font-weight="800" font-size="34">ВАННАЯ</text>
+  </svg>`;
+  plaque(r,150,1000,'g','0 окон · 0 устройств','');
+  plaque(r,130,320,'r','Счётчик воды: онлайн','видит расход');
+},(r,t,K,t0)=>{
+  const P=$('#path5',r),L=P.getTotalLength();P.style.strokeDasharray=`14 10`;P.style.opacity=1;
+  P.style.clipPath='none';P.setAttribute('stroke-dashoffset',0);P.style.strokeDasharray=`${L*eo(pr(t,K.go,1))} ${L}`;
+  $('#bath5',r).style.opacity=pr(t,K.go+.6,.3)*(.7+.3*Math.sin(t*4));
+  $$('.devs circle',r).forEach((c,i)=>c.style.opacity=pr(t,K.no+.3+i*.08,.2)*(.6+.4*Math.sin(t*5+i)));
+  $('#tile5',r).style.opacity=pr(t,K.tile,.4);
+  const [a,b]=$$('.plq',r);pop(a,t,K.no);pop(b,t,K.meter);
+});
+
+/* ---------- 6. телефон выключить ---------- */
+scene('Четвёртое','05:11',{air:'не авиарежим',off:'выключите',hear:'не слышит'},(r)=>{
+  r.innerHTML=`<div class="phone" style="left:290px;top:270px;width:500px;height:900px"><div class="top"><span>05:11</span><span>29%</span></div>
+   <div id="scr6" style="position:absolute;inset:60px 0 0 0;display:flex;flex-direction:column;align-items:center;gap:30px;padding-top:120px">
+    <div id="air6" style="width:150px;height:150px;border-radius:30px;background:#e8a33c;display:grid;place-items:center;font:900 90px Inter;color:#111;position:relative">✈<div id="x6" style="position:absolute;left:-10px;right:-10px;top:68px;height:14px;background:var(--r);transform:rotate(-40deg);opacity:0"></div></div>
+    <div id="sl6" style="margin-top:80px;width:400px;height:96px;border-radius:48px;background:#1f2430;position:relative;opacity:0"><div id="kn6" style="position:absolute;left:8px;top:8px;width:80px;height:80px;border-radius:50%;background:#fff;display:grid;place-items:center;font:900 40px Inter;color:#ff3b3b">⏻</div><div style="position:absolute;left:110px;top:30px;font:600 28px Inter;color:#aab">выключить</div></div></div>
+   <div id="blk6" style="position:absolute;inset:0;background:#000;opacity:0"></div></div>`;
+  plaque(r,170,1060,'g','Микрофон: выключен','телефон не слышит');
+},(r,t,K,t0)=>{
+  $('#x6',r).style.opacity=pr(t,K.air+.2,.2);
+  $('#sl6',r).style.opacity=pr(t,K.off-.2,.3);$('#kn6',r).style.left=(8+304*eio(pr(t,K.off+.2,.7)))+'px';
+  $('#blk6',r).style.opacity=pr(t,K.off+1,.5);pop($('.plq',r),t,K.hear);
+});
+
+/* ---------- 7. тишина, лифт ---------- */
+scene('В пять двадцать','05:20',{quiet:'замолкает',vac:'стихает',lift:'лифт',floor:'на вашем этаже',doors:'двери стоят'},(r)=>{
+  let fl='';for(let f=0;f<9;f++){const y=1150-f*95;fl+=`<path d="M150 ${y} H930" stroke="#232838" stroke-width="3"/><text x="120" y="${y-30}" text-anchor="end" fill="${f==6?'#3dff8f':'#4a5060'}" font-family="JetBrains Mono" font-size="24">${f+1}</text>`}
+  r.innerHTML=`<svg class="abs" style="left:0;top:0" width="1080" height="1250">${fl}
+   <rect x="470" y="295" width="140" height="855" fill="none" stroke="#3a3f4c" stroke-width="3"/>
+   <g id="cab7"><rect x="478" y="0" width="124" height="82" fill="#cfd3db"/><rect id="dl7" x="478" y="0" width="62" height="82" fill="#8a8f9c"/><rect id="dr7" x="540" y="0" width="62" height="82" fill="#8a8f9c"/></g>
+   <rect x="640" y="${1150-6*95-70}" width="120" height="70" fill="none" stroke="#3dff8f" stroke-width="4"/><text x="700" y="${1150-6*95+28}" text-anchor="middle" fill="#3dff8f" font-family="Inter" font-weight="800" font-size="24">ВЫ</text>
+  </svg>`;
+  plaque(r,60,250,'gr','Голос за дверью: тишина','');
+  plaque(r,60,370,'gr','Пылесос: остановлен','кв. 32');
+  plaque(r,520,960,'r','Двери: <span class="mono" id="tm7">01:00</span>','лифт открыт · 7 этаж');
+},(r,t,K,t0)=>{
+  const fy=f=>1150-f*95-88;const y=lerp(fy(0),fy(6),eio(pr(t,K.lift,K.floor-K.lift+.2)));
+  $('#cab7',r).setAttribute('transform',`translate(0 ${y})`);
+  const o=eo(pr(t,K.floor+.3,.6))*56;$('#dl7',r).setAttribute('x',478-o);$('#dl7',r).setAttribute('width',62);$('#dr7',r).setAttribute('x',540+o);
+  $('#cab7',r).setAttribute('clip-path','');$('#dl7',r).style.opacity=o>50?0:1;$('#dr7',r).style.opacity=o>50?0:1;
+  const [a,b,c]=$$('.plq',r);pop(a,t,K.quiet);pop(b,t,K.vac);pop(c,t,K.doors);
+  $('#tm7',r).textContent='00:'+pad(Math.max(0,60-Math.floor(Math.max(0,t-K.doors)*8)));
+});
+
+/* ---------- 8. холодильник ---------- */
+scene('Становится','05:31',{hum:'гудит',stop:'холодильник замолкает',net:'в сети'},(r)=>{
+  r.innerHTML=`<div class="abs" style="left:380px;top:280px;width:320px;height:880px;border-radius:24px;background:linear-gradient(90deg,#cfd3db,#e8ebf0 50%,#c3c7cf)">
+   <div style="position:absolute;left:0;right:0;top:300px;height:4px;background:#9aa0aa"></div>
+   <div style="position:absolute;left:24px;top:110px;width:14px;height:150px;border-radius:7px;background:#9aa0aa"></div><div style="position:absolute;left:24px;top:340px;width:14px;height:200px;border-radius:7px;background:#9aa0aa"></div>
+   <div id="disp8" style="position:absolute;left:110px;top:80px;width:170px;height:96px;border-radius:12px;background:#0d0f14;display:grid;place-items:center;font:700 36px JetBrains Mono;color:var(--c)">+4°</div></div>
+  <svg class="abs" id="hum8" style="left:0;top:0" width="1080" height="1250"></svg>`;
+  plaque(r,170,1040,'r','Холодильник: в сети','Wi-Fi · онлайн с 02:47');
+},(r,t,K,t0)=>{
+  const on=t<K.stop+.6;let h='';if(t>K.hum-.6&&on)for(let k=0;k<3;k++){let d='';for(let x=0;x<=200;x+=10)d+=(x?'L':'M')+(720+x)+' '+(560+k*60+Math.sin(x/14+t*8+k)*12*(1-x/260));h+=`<path d="${d}" stroke="#8a8f9c" stroke-width="4" fill="none" opacity="${.7-k*.2}"/>`;h+=`<path d="${d.replace(/([ML])(\d+)/g,(m,a,b)=>a+(1080-+b))}" stroke="#8a8f9c" stroke-width="4" fill="none" opacity="${.7-k*.2}"/>`}
+  $('#hum8',r).innerHTML=h;
+  const d=$('#disp8',r);const net=t>K.net-.1;d.textContent=net?'ONLINE':'+4°';d.style.color=net?'var(--r)':'var(--c)';d.style.fontSize=net?'30px':'36px';
+  pop($('.plq',r),t,K.net);
+});
+
+/* ---------- 9. звонок ---------- */
+scene('Пять сорок шесть','05:46',{dawn:'до рассвета',lit:'загорается',call:'входящий'},(r)=>{
+  r.innerHTML=`<div class="phone" style="left:290px;top:300px;width:500px;height:880px"><div id="cs9" style="position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse at 50% 30%,#22304d,#0b0d12 70%);display:flex;flex-direction:column;align-items:center;padding-top:150px">
+   <div style="font:500 26px Inter;color:#aab">входящий вызов</div><div class="av" style="width:170px;height:170px;font-size:80px;margin:40px 0 24px">М</div><div style="font:700 56px Inter">Мама</div>
+   <div style="display:flex;gap:120px;margin-top:180px"><div class="btn9" style="width:110px;height:110px;border-radius:50%;background:#ff3b3b"></div><div class="btn9" style="width:110px;height:110px;border-radius:50%;background:#3dff8f"></div></div></div></div>
+  <svg class="abs" id="rg9" style="left:0;top:0" width="1080" height="1250"></svg>`;
+  plaque(r,250,250,'y','До рассвета: <span class="mono" id="cd9">01:00</span>','05:47');
+},(r,t,K,t0)=>{
+  pop($('.plq',r),t,K.dawn);$('#cd9',r).textContent='00:'+pad(Math.max(0,60-Math.floor(Math.max(0,t-K.dawn))));
+  $('#cs9',r).style.opacity=flick(t,K.lit);
+  let h='';if(t>K.call)for(let k=0;k<2;k++){const ph=((t*.9+k/2)%1);h+=`<rect x="${290-ph*80}" y="${300-ph*80}" width="${500+ph*160}" height="${880+ph*160}" rx="${64+ph*30}" fill="none" stroke="#3dff8f" stroke-width="4" opacity="${(1-ph)*.6}"/>`}$('#rg9',r).innerHTML=h;
+  $$('.btn9',r).forEach((b,i)=>b.style.transform=`scale(${1+.08*Math.sin(t*8+i)})`);
+  $('.phone',r).style.transform=t>K.call?`translateX(${Math.sin(t*70)*3}px)`:'none';
+});
+
+/* ---------- 10. её голос и 0% ---------- */
+scene('А из-за двери','05:46',{her:'её голос',look:'вы смотрите',zero:'ноль процентов'},(r)=>{
+  r.innerHTML=DOOR+`<div class="abs" id="ov10" style="left:0;top:0;width:1080px;height:1250px;background:rgba(7,8,12,.92);opacity:0;display:grid;place-items:center">
+   <div style="text-align:center"><div style="display:inline-block;width:420px;height:180px;border:8px solid #ff3b3b;border-radius:26px;padding:14px;position:relative"><div style="position:absolute;right:-30px;top:55px;width:20px;height:60px;border-radius:0 8px 8px 0;background:#ff3b3b"></div><div style="height:100%;width:4px;background:#ff3b3b;border-radius:4px"></div></div>
+   <div id="z10" style="font:900 200px/1 Inter;color:#ff3b3b;margin-top:40px;text-shadow:0 0 50px rgba(255,59,59,.6)">0%</div>
+   <div style="font:600 26px JetBrains Mono;color:#ff8a8a;letter-spacing:3px;margin-top:10px">ЗАРЯД · ВЫЗОВ АКТИВЕН</div></div></div>`;
+  plaque(r,250,262,'r','Голос: мама · 97%','за дверью · кв. 28');
+},(r,t,K,t0)=>{
+  doorFx(r,t,t>K.her-.2&&t<K.look);pop($('.plq',r),t,K.her,K.look);
+  const o=pr(t,K.look,.4);$('#ov10',r).style.opacity=o;$('#z10',r).style.opacity=t>K.zero?(Math.sin(t*10)>-.3?1:.3):0;
+  r.style.transform=`scale(${1+.05*eio(pr(t,t0,8))})`;
+});
+
+SC[SC.length-1].self=true;
+
+/* ---------- 11. финал ---------- */
+scene('__END__',null,{},(r)=>{
+  r.innerHTML=`<div class="endt" id="e1" style="top:560px;font:900 170px/1 Inter;letter-spacing:-4px">ЧАСТЬ 3</div>
+  <div class="endt" id="e2" style="top:750px;font:900 96px Inter;color:var(--y)">РАССВЕТ</div>
+  <div class="endt" id="e3" style="top:900px;font:600 40px Inter">А ты бы взял трубку? Пиши в комментариях</div>
+  <div class="endt" id="e4" style="top:970px;font:600 26px 'JetBrains Mono';color:var(--r);letter-spacing:2px">ПОДПИШИСЬ, ЧТОБЫ НЕ ПРОПУСТИТЬ</div>`;
+},(r,t,K,t0)=>{
+  const L=t-t0,e1=$('#e1',r);const g=L<.9?(Math.sin(L*60)>0?14:-10)*(1-L/.9):0;
+  e1.style.opacity=flick(t,t0+.1);e1.style.textShadow=`${g}px 0 0 rgba(255,0,60,.9),${-g}px 0 0 rgba(0,220,255,.9)`;
+  e1.style.transform=`translateX(${L<.9?g*.6:0}px) scale(${1+.03*(1-eo(pr(t,t0,.8)))})`;
+  pop($('#e2',r),t,t0+.8);pop($('#e3',r),t,t0+1.5);pop($('#e4',r),t,t0+1.9);
+});
+
+/* ---------- субтитры ---------- */
+const ACC=[['y','четыре секунды','девять из десяти','сорок','второе','третье','четвёртое','пять двадцать','пять тридцать одну','пять сорок шесть','одна минута','ровно минуту'],
+ ['r','не отвечайте','ваш собственный голос','не смотрите','на вашем этаже','он тоже был в сети','мама','возьми трубку','ноль процентов','загорается сам','не слышит'],
+ ['gr','запомните одно правило']];
+const NUM=[['пять сорок шесть','5:46'],['пять двадцать','5:20'],['пять тридцать одну','5:31'],['четыре секунды','4 секунды'],['девять из десяти','9 из 10'],['сорок','40'],['одна минута','1 минута'],['ноль процентов','0%']];
+
+let CHUNKS=[];
+function buildCaps(){
+  const W=WORDS.map(w=>({...w,n:norm(w.w),c:'w'}));
+  const match=(i,ph)=>ph.every((p,k)=>W[i+k]&&W[i+k].n===p);
+  for(const [col,...phs] of ACC)for(const ph of phs){const p=ph.split(' ');for(let i=0;i<W.length;i++)if(match(i,p))for(let k=0;k<p.length;k++)W[i+k].c=col}
+  const toks=[];
+  for(let i=0;i<W.length;i++){
+    if(W[i].w==='—')continue;
+    const m=NUM.find(([ph])=>match(i,ph.split(' ')));
+    if(m){const n=m[0].split(' ').length;const last=W[i+n-1].w;toks.push({d:m[1]+(last.match(/[.,!?:»]+$/)||[''])[0],t:W[i].t,e:W[i+n-1].e,c:W[i].c==='w'?'y':W[i].c,brk:/[.!?:»]$/.test(last),com:/,$/.test(last)});i+=n-1;continue}
+    toks.push({d:W[i].w,t:W[i].t,e:W[i].e,c:W[i].c,brk:/[.!?:»]$/.test(W[i].w),com:/,$/.test(W[i].w)});
+  }
+  let cur=[];const flush=()=>{if(cur.length)CHUNKS.push(cur);cur=[]};
+  for(const k of toks){const len=cur.reduce((a,x)=>a+x.d.length+1,0);if(cur.length&&(cur.length>=4||len+k.d.length>22))flush();cur.push(k);if(k.brk||(k.com&&cur.length>=2))flush()}
+  flush();
+}
+const cap=document.getElementById('cap');let lastChunk=-1;
+function drawCaps(t){
+  let idx=-1;for(let i=0;i<CHUNKS.length;i++){if(CHUNKS[i][0].t<=t)idx=i;else break}
+  if(idx>=0){const ch=CHUNKS[idx],next=CHUNKS[idx+1];const until=Math.min(next?next[0].t:1e9,ch[ch.length-1].e+1.2);if(t>until)idx=-1}
+  if(idx!==lastChunk){cap.innerHTML=idx<0?'':CHUNKS[idx].map(k=>`<span class="${k.c}">${k.d.replace(/[«»]/g,'').replace(/^—$/,'')}</span>`).join('');lastChunk=idx}
+  if(idx>=0)CHUNKS[idx].forEach((k,i)=>{const s=cap.children[i],p=pr(t,k.t-.04,.16);s.style.opacity=t<k.t-.04?.0:1;s.style.transform=`translateY(${(1-eo(p))*14}px) scale(${.92+.08*bo(p)})`});
+}
+
+/* ---------- фон: город гаснет ---------- */
+const bg=document.getElementById('bg').getContext('2d');let WIN=[],STARS=[];
+function initBg(){const R=rng(11);
+  for(let i=0;i<140;i++)STARS.push([R()*1080,R()*1300,R()*1.6+.4,R()]);
+  let x=-20;while(x<1100){const w=60+R()*110,h=180+R()*330,top=1920-h;for(let yy=top+16;yy<1910;yy+=22)for(let xx=x+10;xx<x+w-10;xx+=18)if(R()<.42)WIN.push([xx,yy,R(),R()<.12]);WIN.push([x,top,w,h,'b']);x+=w+6+R()*12}}
+function drawBg(t){bg.fillStyle='#07080c';bg.fillRect(0,0,1080,1920);
+  const g=bg.createLinearGradient(0,900,0,1920);g.addColorStop(0,'rgba(20,40,70,0)');g.addColorStop(1,'rgba(30,60,110,.25)');bg.fillStyle=g;bg.fillRect(0,900,1080,1020);
+  for(const [x,y,r,ph] of STARS){bg.globalAlpha=.25+.25*Math.sin(t*1.3+ph*20);bg.fillStyle='#cfe0ff';bg.fillRect(x,y,r,r)}bg.globalAlpha=1;
+  for(const b of WIN)if(b[4]==='b'){bg.fillStyle='#0b0d13';bg.fillRect(b[0],b[1],b[2],b[3])}
+  const k=clamp(t/VOICE_END);
+  for(const w of WIN)if(w[4]!=='b'){if(w[2]<k*.85)continue;bg.fillStyle=w[3]?'rgba(62,230,255,.55)':'rgba(214,160,70,.55)';bg.fillRect(w[0],w[1],8,10)}
+}
+const gr=document.getElementById('grain').getContext('2d');const GI=gr.createImageData(540,960);
+function drawGrain(t){const R=rng(Math.floor(t*30)+1);for(let i=0;i<GI.data.length;i+=4){const v=R()*255;GI.data[i]=GI.data[i+1]=GI.data[i+2]=v;GI.data[i+3]=255}gr.putImageData(GI,0,0)}
+
+/* ---------- запуск ---------- */
+window.setup=function(words,voiceEnd){
+  WORDS=words;VOICE_END=voiceEnd;const host=document.getElementById('scenes');let prev=0;
+  SC.forEach((s,i)=>{s.t0=s.start===0?0:s.start==='__END__'?voiceEnd+.5:find(s.start,prev);prev=s.t0;s.K={};let after=s.t0;for(const [k,ph] of Object.entries(s.keys)){s.K[k]=find(ph,after);after=s.K[k]+.02}s.root=el('div','scene',host);s.build(s.root)});
+  SC.forEach((s,i)=>s.t1=SC[i+1]?SC[i+1].t0:voiceEnd+6.5);TOTAL=SC[SC.length-1].t1;
+  initBg();buildCaps();return TOTAL;
+};
+window.renderAt=function(t){
+  drawBg(t);drawGrain(t);
+  let clock=null,flash=0;
+  SC.forEach((s,i)=>{const vis=t>=s.t0-.3&&t<s.t1+.3;s.root.style.display=vis?'block':'none';if(!vis)return;
+    const fi=i==0?1:pr(t,s.t0-.12,.25),fo=1-pr(t,s.t1-.12,.25);s.root.style.opacity=Math.min(fi,fo);
+    s.update(s.root,t,s.K,s.t0,s.t1);
+    if(!s.self){const z=1+.04*pr(t,s.t0,s.t1-s.t0);s.root.style.transform=`scale(${z*(1+.03*(1-eo(pr(t,s.t0-.12,.5))))})`}
+    if(t>=s.t0&&t<s.t1){clock=s.clock;if(i>0)flash=Math.max(flash,.1*(1-pr(t,s.t0,.18)))}});
+  const ck=document.getElementById('clock');ck.style.display=clock?'inline-block':'none';if(clock)ck.textContent=`ДЕНЬ 1 — ${clock}`;
+  document.getElementById('flash').style.opacity=flash;
+  drawCaps(t>VOICE_END+.4?-1:t);
+};
+</script>
+</body>
+</html>

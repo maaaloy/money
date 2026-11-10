@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>08 — Бункер 72 часа</title>
+<style>
+:root{--bg:#07080c;--y:#f5c542;--r:#ff3b3b;--c:#3ee6ff;--g:#3dff8f;--gr:#8a8f9c;--w:#f2f4f8}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1920px;background:var(--bg);overflow:hidden}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:Inter,sans-serif;color:var(--w)}
+#bg,#grain{position:absolute;inset:0}
+.scene{position:absolute;inset:0;opacity:0;transform-origin:540px 720px}
+#hud{position:absolute;top:150px;left:0;right:0;text-align:center}
+#clock{display:inline-block;font:700 30px 'JetBrains Mono',monospace;color:var(--y);background:rgba(20,18,8,.85);border:2px solid rgba(245,197,66,.35);padding:8px 20px;border-radius:6px;letter-spacing:1px}
+#cap{position:absolute;left:70px;right:70px;top:1290px;text-align:center;font:900 76px/1.04 Inter,sans-serif;text-transform:uppercase;letter-spacing:-1px}
+#cap span{display:inline-block;margin:0 .13em;text-shadow:0 4px 18px rgba(0,0,0,.9),0 0 2px #000}
+#vig{position:absolute;inset:0;background:radial-gradient(ellipse 80% 65% at 50% 42%,transparent 50%,rgba(0,0,0,.75) 100%),repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 2px,transparent 2px 4px);pointer-events:none}
+#flash{position:absolute;inset:0;background:#fff;opacity:0}
+.abs{position:absolute}
+.plq{position:absolute;display:flex;gap:16px;align-items:center;padding:14px 22px 14px 16px;border:3px solid currentColor;border-radius:10px;background:rgba(7,9,14,.88);box-shadow:0 0 26px -4px currentColor,inset 0 0 18px -8px currentColor;opacity:0;white-space:nowrap}
+.plq i{width:34px;height:34px;border:2.5px solid currentColor;border-radius:6px;display:grid;place-items:center;font:900 22px Inter;font-style:normal}
+.plq i::after{content:'!'}
+.plq.c i::after,.plq.g i::after{content:'i'}
+.plq b{display:block;font:800 34px/1.1 Inter;color:var(--w);text-transform:uppercase}
+.plq small{display:block;font:500 19px 'JetBrains Mono',monospace;color:currentColor;opacity:.85;margin-top:3px;text-transform:uppercase}
+.y{color:var(--y)}.r{color:var(--r)}.c{color:var(--c)}.g{color:var(--g)}.gr{color:var(--gr)}
+.mono{font-family:'JetBrains Mono',monospace}
+/* s1 */
+.dev{position:absolute}
+.tv{left:150px;top:290px;width:780px;height:460px;border:10px solid #1a1d24;border-radius:14px;background:#050608}
+.tv .stand{position:absolute;left:330px;bottom:-56px;width:100px;height:46px;background:#14161c;border-radius:0 0 8px 8px}
+.ph{left:170px;top:830px;width:260px;height:420px;border:9px solid #1a1d24;border-radius:36px;background:#050608}
+.spk{left:660px;top:880px;width:230px;height:330px;border-radius:40px;background:linear-gradient(90deg,#15171d,#22252d 50%,#15171d)}
+.scr{position:absolute;inset:0;border-radius:inherit;overflow:hidden;opacity:0;background:radial-gradient(ellipse at 50% 40%,#5a0b10,#22050a 75%);box-shadow:inset 0 0 60px rgba(255,59,59,.35)}
+.scrc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+.hdr{font:600 22px 'JetBrains Mono';color:#ff8a8a;letter-spacing:2px}
+.big{font:900 84px/1 Inter;color:#fff;text-shadow:0 0 30px rgba(255,59,59,.8)}
+.big.sm{font-size:40px;padding:0 16px}
+.ring{position:absolute;left:25px;right:25px;top:18px;height:26px;border-radius:13px;background:#2a2d35}
+.mesh{position:absolute;left:22px;right:22px;top:70px;bottom:80px;background:radial-gradient(circle,#0b0c10 2.5px,transparent 3px) 0 0/16px 16px}
+.led{position:absolute;left:24px;right:24px;bottom:22px;height:40px;border-radius:6px;background:#080809;overflow:hidden;font:700 24px/40px 'JetBrains Mono';color:var(--r);white-space:nowrap}
+.led span{display:inline-block}
+/* bars / generic */
+.bar{position:absolute;height:26px;border:3px solid currentColor;border-radius:8px;overflow:hidden}
+.bar>div{height:100%;background:currentColor;width:0}
+.chk{position:absolute;left:150px;width:780px;padding:22px 28px;border:2px solid #2a2f3a;border-radius:12px;background:rgba(10,12,18,.9)}
+.chk h4{font:600 20px 'JetBrains Mono';color:var(--y);letter-spacing:2px;margin-bottom:12px}
+.chk p{font:800 32px/1.55 Inter;text-transform:uppercase;color:#6b7080;display:flex;align-items:center;gap:16px}
+.chk p::before{content:'';width:32px;height:32px;border:3px solid #4a4f5c;border-radius:6px;flex:none}
+.chk p.on{color:var(--w)}
+.chk p.on::before{border-color:var(--g);background:var(--g) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12l5 5 9-10' stroke='%2307080c' stroke-width='3.5' fill='none'/%3E%3C/svg%3E") center/80% no-repeat}
+.tag{position:absolute;font:800 28px Inter;text-transform:uppercase;padding:10px 20px;border:2.5px solid currentColor;border-radius:8px;background:rgba(7,9,14,.9);opacity:0}
+/* chat */
+.phone{position:absolute;left:250px;top:250px;width:580px;height:960px;border:12px solid #1b1e25;border-radius:64px;background:#0b0d12;overflow:hidden}
+.phone .top{display:flex;justify-content:space-between;padding:26px 44px 0;font:600 24px 'JetBrains Mono';color:#aab}
+.phone .who{display:flex;gap:18px;align-items:center;padding:26px 30px 20px;border-bottom:1px solid #1d212a}
+.av{width:68px;height:68px;border-radius:50%;background:#2c3550;display:grid;place-items:center;font:800 32px Inter}
+.who b{font:700 32px Inter;display:block}.who small{font:400 21px Inter;color:#7d8394}
+.msgs{padding:20px 26px;display:flex;flex-direction:column;gap:16px}
+.day{align-self:center;font:500 19px 'JetBrains Mono';color:#6d7384;margin:6px 0}
+.vm{align-self:flex-start;display:flex;align-items:center;gap:14px;padding:16px 22px;border-radius:24px;background:#1b2030;border:3px solid transparent}
+.vm .pl{width:42px;height:42px;border-radius:50%;background:#3d4a6e;display:grid;place-items:center}
+.vm .pl::after{content:'';border-left:15px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px}
+.vm .wv{display:flex;gap:4px;align-items:center;height:40px}
+.vm .wv i{width:5px;border-radius:3px;background:#8fa0c8}
+.vm em{font:500 20px 'JetBrains Mono';color:#9aa;font-style:normal}
+.tx{align-self:flex-start;max-width:420px;padding:18px 24px;border-radius:24px;background:#1b2030;font:500 31px/1.3 Inter;opacity:0}
+.tx small{display:block;text-align:right;font:400 18px 'JetBrains Mono';color:#7d8394;margin-top:4px}
+/* end */
+.endt{position:absolute;left:0;right:0;text-align:center}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="bg" width="1080" height="1920"></canvas>
+  <div id="ship" style="position:absolute;left:-360px;top:-640px;width:1800px;height:1240px;border-radius:50%;opacity:0;background:radial-gradient(ellipse at 50% 50%,#05060a 0 64%,rgba(5,6,10,.7) 69%,rgba(5,6,10,0) 72%)"><div style="position:absolute;left:8%;right:8%;bottom:9%;height:46%;border-radius:50%;border-bottom:6px dotted rgba(62,230,255,.45)"></div></div>
+  <div id="dawn" style="position:absolute;inset:0;opacity:0;background:linear-gradient(#1b2740 0%,#3a3550 45%,#8a5a4a 72%,#c98a55 85%,#2a2230 100%)"></div>
+  <div id="scenes"></div>
+  <div id="vig"></div>
+  <canvas id="grain" width="540" height="960" style="width:1080px;height:1920px;opacity:.07;mix-blend-mode:screen"></canvas>
+  <div id="hud"><span id="clock"></span></div>
+  <div id="cap"></div>
+  <div id="flash"></div>
+</div>
+<script>
+'use strict';
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const lerp=(a,b,p)=>a+(b-a)*p;
+const eo=p=>1-Math.pow(1-clamp(p),3);
+const eio=p=>{p=clamp(p);return p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2};
+const bo=p=>{p=clamp(p);const c1=1.6,c3=c1+1;return 1+c3*Math.pow(p-1,3)+c1*Math.pow(p-1,2)};
+const pr=(t,a,d=.5)=>clamp((t-a)/d);
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function el(tag,cls,parent,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;if(parent)parent.appendChild(e);return e}
+function plaque(parent,x,y,col,title,sub){const d=el('div','plq '+col,parent,`<i></i><div><b>${title}</b>${sub?`<small>${sub}</small>`:''}</div>`);d.style.left=x+'px';d.style.top=y+'px';return d}
+function pop(e,t,at,out){const p=pr(t,at,.45),s=bo(p);let o=clamp(p*3);if(out!=null)o*=1-pr(t,out,.3);e.style.opacity=o;e.style.transform=`translateY(${(1-s)*28}px) scale(${.86+.14*s})`}
+function flick(t,at){if(t<at)return 0;const d=t-at;if(d>.3)return 1;return [1,.15,.8,.1,1,.4,1][Math.floor(d*23)]??1}
+const pad=n=>String(n).padStart(2,'0');
+
+let WORDS=[],SC=[],TOTAL=0,VOICE_END=0;
+const norm=s=>s.toLowerCase().replace(/[^a-zа-яё0-9-]/g,'');
+function find(ph,after=0){const p=ph.split(' ').map(norm);for(let i=0;i<WORDS.length;i++){if(WORDS[i].t<after-.01)continue;let ok=true;for(let k=0;k<p.length;k++)if(!WORDS[i+k]||norm(WORDS[i+k].w)!==p[k]){ok=false;break}if(ok)return WORDS[i].t}throw new Error('нет якоря: '+ph)}
+function scene(start,clock,keys,build,update){SC.push({start,clock,keys,build,update})}
+
+const ALL_DARK=true, NO_CITY=true;
+const fig=(c)=>`<svg width="100%" height="100%" viewBox="0 0 150 190"><circle cx="75" cy="55" r="38" fill="${c}"/><path d="M8 190 C 8 120, 40 100, 75 100 C 110 100, 142 120, 142 190Z" fill="${c}"/></svg>`;
+const HOOK=(r,txt)=>{const h=el('div','abs',r,txt);h.style.cssText='left:70px;right:70px;top:300px;text-align:center;font:900 84px/1.05 Inter;text-transform:uppercase;text-shadow:0 6px 30px #000;opacity:0';return h};
+const hook=(h,t)=>{h.style.opacity=pr(t,0,.25)*(1-pr(t,2,.35));h.style.transform=`scale(${1.08-.08*eo(pr(t,0,.5))})`};
+const END=()=>scene('__END__',null,{},(r)=>{r.innerHTML=`<div class="endt" id="e1" style="top:600px;font:900 110px/1 Inter;letter-spacing:-2px">ВЫЖИВАНИЕ<br>ПОСЛЕ<span style="color:var(--r)">…</span></div><div class="endt" id="e2" style="top:880px;font:600 30px 'JetBrains Mono';color:var(--y);letter-spacing:2px">ПОДПИШИСЬ — НОВЫЙ СЦЕНАРИЙ КАЖДЫЙ ДЕНЬ</div>`},
+  (r,t,K,t0)=>{pop($('#e1',r),t,t0+.1);pop($('#e2',r),t,t0+.6)});
+
+/* ---------- 1. дверь закрылась ---------- */
+scene(0,'БУНКЕР — ЧАС 0',{closed:'закрылась',h72:'семьдесят два'},(r)=>{
+  let bolts='';for(let i=0;i<12;i++){const a=i/12*Math.PI*2;bolts+=`<circle cx="${540+Math.cos(a)*300}" cy="${760+Math.sin(a)*300}" r="16" fill="#6b7080"/>`}
+  r.innerHTML=`<div class="abs" id="red1" style="inset:0;background:radial-gradient(circle at 50% 10%,rgba(255,40,40,.5),rgba(255,40,40,0) 60%)"></div>
+  <svg class="abs" style="left:0;top:0" width="1080" height="1250"><circle cx="540" cy="760" r="380" fill="#0d0f14" stroke="#2a2f3a" stroke-width="10"/>
+   <g id="door1"><circle cx="540" cy="760" r="350" fill="#3a3f4c" stroke="#22252d" stroke-width="12"/><circle cx="540" cy="760" r="250" fill="none" stroke="#2a2f3a" stroke-width="8"/>${bolts}
+   <g id="wh1"><circle cx="540" cy="760" r="90" fill="none" stroke="#9aa0aa" stroke-width="16"/><path d="M450 760 H630 M540 670 V850" stroke="#9aa0aa" stroke-width="16"/></g></g></svg>
+  <div id="dust1"></div>`;
+  const R=rng(3),d=$('#dust1',r);for(let i=0;i<40;i++){const p=el('i','abs',d);p.style.cssText=`left:${200+R()*680}px;top:${380+R()*80}px;width:${3+R()*4}px;height:${3+R()*4}px;border-radius:50%;background:#bfb59c`;p.dataset.v=(.6+R()).toFixed(2)}
+  HOOK(r,'Дверь бункера закрылась. <span style="color:var(--r)">Часы пошли.</span>');
+  plaque(r,330,1120,'y','<span class="mono" id="c1">72:00:00</span>','до первых решений');
+},(r,t,K,t0)=>{const c=eio(pr(t,0,.7));$('#door1',r).setAttribute('transform',`translate(${(1-c)*900} 0)`);$('#wh1',r).setAttribute('transform',`rotate(${eo(pr(t,.8,1.2))*180} 540 760)`);
+  r.style.transform=t>.65&&t<.95?`translate(${Math.sin(t*90)*10}px,${Math.cos(t*70)*8}px)`:'';
+  $$('#dust1 i',r).forEach(p=>p.style.transform=`translateY(${Math.max(0,t-.7)*220*+p.dataset.v}px)`);$('#dust1',r).style.opacity=1-pr(t,3,1);
+  $('#red1',r).style.opacity=Math.sin(t*9)>0?1:.35;hook(r.children[3],t);
+  pop($('.plq',r),t,K.h72);const left=72*3600-Math.max(0,t-K.h72)*600;$('#c1',r).textContent=`${pad(Math.floor(left/3600))}:${pad(Math.floor(left%3600/60))}:${pad(Math.floor(left%60))}`});
+SC[SC.length-1].self=true;
+
+/* ---------- 2. вода ---------- */
+scene('Первое','БУНКЕР — ЧАС 0',{count:'посчитай',three:'трёх литров',food:'еда подождёт'},(r)=>{
+  let b='';for(let s=0;s<2;s++){b+=`<rect x="140" y="${560+s*260}" width="800" height="22" fill="#5a5f6c"/>`;for(let i=0;i<9;i++)b+=`<g class="bt2" data-i="${s*9+i}"><rect x="${170+i*86}" y="${420+s*260}" width="56" height="140" rx="14" fill="rgba(95,217,255,.35)" stroke="#5fd9ff" stroke-width="4"/><rect x="${185+i*86}" y="${400+s*260}" width="26" height="24" rx="4" fill="#3a8fd6"/></g>`}
+  r.innerHTML=`<svg class="abs" style="left:0;top:0" width="1080" height="1250">${b}</svg>`;
+  plaque(r,170,280,'c','Запас: <span class="mono" id="n2">0</span> л','считаем сразу');
+  plaque(r,170,1000,'y','3 л · на человека · в день','делим с первого часа');
+  plaque(r,170,1120,'r','Еда подождёт. Вода — нет','');
+},(r,t,K,t0)=>{let n=0;$$('.bt2',r).forEach(g=>{const on=t>K.count+ +g.dataset.i*.07;g.style.opacity=on?1:0;if(on)n++});$('#n2',r).textContent=n*1.5;
+  const [a,b,c]=$$('.plq',r);pop(a,t,K.count);pop(b,t,K.three);pop(c,t,K.food)});
+
+/* ---------- 3. воздух ---------- */
+scene('Второе','БУНКЕР — ЧАС 1',{vent:'вентиляцию',candle:'свечи',gen:'генератор',co:'угарный'},(r)=>{
+  let g='';for(let i=0;i<9;i++)g+=`<rect x="300" y="${330+i*44}" width="480" height="18" rx="4" fill="#4a4f5c"/>`;
+  r.innerHTML=`<svg class="abs" style="left:0;top:0" width="1080" height="1250"><rect x="280" y="310" width="520" height="420" rx="16" fill="#15181f" stroke="#5a5f6c" stroke-width="6"/>
+   <g id="fan3"><circle cx="540" cy="520" r="150" fill="#0d0f14"/>${[0,1,2,3].map(i=>`<path d="M540 520 Q ${540+100*Math.cos(i*Math.PI/2)} ${520+100*Math.sin(i*Math.PI/2)-60} ${540+140*Math.cos(i*Math.PI/2+.4)} ${520+140*Math.sin(i*Math.PI/2+.4)}" stroke="#9aa0aa" stroke-width="22" fill="none" stroke-linecap="round"/>`).join('')}</g>${g}<g id="air3"></g></svg>`+
+  [['🕯',150],['⚙',600]].map(([e,x],i)=>`<div class="abs ic3" style="left:${x+40}px;top:800px;width:260px;height:200px;border:3px solid #2a2f3a;border-radius:24px;background:#10131b;display:grid;place-items:center;font-size:${i?120:110}px;opacity:0">${e}<div class="x3" style="position:absolute;inset:0;opacity:0"><svg width="260" height="200"><path d="M50 30L210 170M210 30L50 170" stroke="#ff3b3b" stroke-width="12" stroke-linecap="round"/></svg></div></div>`).join('');
+  plaque(r,170,1060,'r','Угарный газ не пахнет','не жечь · не заводить внутри');
+},(r,t,K,t0)=>{$('#fan3',r).setAttribute('transform',`rotate(${t*240} 540 520)`);let h='';for(let i=0;i<14;i++){const ph=(t*.6+i/14)%1;h+=`<circle cx="${330+(i*37)%440}" cy="${700-ph*380}" r="4" fill="#cfc4a8" opacity="${(1-ph)*.8}"/>`}$('#air3',r).innerHTML=h;
+  const ks=[K.candle,K.gen];$$('.ic3',r).forEach((e,i)=>{e.style.opacity=pr(t,ks[i]-.3,.3);pop($('.x3',e),t,ks[i]+.2)});pop($('.plq',r),t,K.co)});
+
+/* ---------- 4. режим ---------- */
+scene('Третье','БУНКЕР — ЧАС 6',{sleep:'сон',food:'еда',radio:'дежурство',head:'голова'},(r)=>{
+  r.innerHTML=`<div class="abs" style="left:110px;top:280px;width:860px;height:640px;border-radius:12px;background:#1c2420;border:14px solid #4a3a28;padding:46px 50px">
+   ${[['22:00','СОН'],['08:00','ЕДА'],['12:00','РАДИО · ДЕЖУРСТВО'],['20:00','ЕДА']].map(([a,b])=>`<div class="ch4" style="font:700 52px/1.6 'JetBrains Mono';color:#e8efe6;opacity:0;text-shadow:0 0 2px #fff">${a} — ${b}</div>`).join('')}</div>
+   <div class="abs" style="left:700px;top:960px;font-size:110px">📻</div>`;
+  plaque(r,110,980,'y','В тишине голова сдаёт','раньше, чем тело');
+},(r,t,K,t0)=>{const ks=[K.sleep,K.food,K.radio,K.radio+.6];$$('.ch4',r).forEach((e,i)=>{const p=pr(t,ks[i],.5);e.style.opacity=p;e.style.clipPath=`inset(0 ${100-p*100}% 0 0)`});pop($('.plq',r),t,K.head)});
+
+/* ---------- 5. выход ---------- */
+scene('Выйти можно','БУНКЕР — ЧАС 72',{only:'только',cta:'продержался'},(r)=>{
+  r.innerHTML=`<svg class="abs" id="rw5" style="left:0;top:0" width="1080" height="1250"></svg><div class="abs" style="left:440px;top:330px;font-size:180px">📻</div>
+   <div class="abs" id="q5" style="left:70px;right:70px;top:860px;text-align:center;font:900 70px/1.1 Inter;opacity:0">А ТЫ БЫ ПРОДЕРЖАЛСЯ <span style="color:var(--y)">3 ДНЯ?</span></div>`;
+  plaque(r,170,620,'g','Выход — только когда безопасно','слушай радио');
+},(r,t,K,t0)=>{const R=rng(Math.floor(t*30));let d='M110 600';for(let x=110;x<=970;x+=10)d+=` L${x} ${600+(R()-.5)*50}`;$('#rw5',r).innerHTML=`<path d="${d}" stroke="#f5c542" stroke-width="3" fill="none" opacity=".7"/>`;
+  pop($('.plq',r),t,K.only);pop($('#q5',r),t,K.cta-.2);r.style.transform=`scale(${1.06-.06*eio(pr(t,t0,4))})`});
+SC[SC.length-1].self=true;
+
+END();
+function EXTRA(t){$('#ship').style.opacity=0;$('#dawn').style.opacity=0}
+
+const ACC=[['y','семьдесят два часа','трёх литров','первое','второе','третье','три дня'],
+ ['r','угарный газ не пахнет','вода нет','голова сдаёт раньше тела'],
+ ['g','безопасно']];
+const NUM=[['семьдесят два часа','72 часа'],['трёх литров','3 литров'],['три дня','3 дня']];
+
+let CHUNKS=[];
+function buildCaps(){
+  const W=WORDS.map(w=>({...w,n:norm(w.w),c:'w'}));
+  const match=(i,ph)=>ph.every((p,k)=>W[i+k]&&W[i+k].n===p);
+  for(const [col,...phs] of ACC)for(const ph of phs){const p=ph.split(' ');for(let i=0;i<W.length;i++)if(match(i,p))for(let k=0;k<p.length;k++)W[i+k].c=col}
+  const toks=[];
+  for(let i=0;i<W.length;i++){
+    if(W[i].w==='—')continue;
+    const m=NUM.find(([ph])=>match(i,ph.split(' ')));
+    if(m){const n=m[0].split(' ').length;const last=W[i+n-1].w;toks.push({d:m[1]+(last.match(/[.,!?:»]+$/)||[''])[0],t:W[i].t,e:W[i+n-1].e,c:W[i].c==='w'?'y':W[i].c,brk:/[.!?:»]$/.test(last),com:/,$/.test(last)});i+=n-1;continue}
+    toks.push({d:W[i].w,t:W[i].t,e:W[i].e,c:W[i].c,brk:/[.!?:»]$/.test(W[i].w),com:/,$/.test(W[i].w)});
+  }
+  let cur=[];const flush=()=>{if(cur.length)CHUNKS.push(cur);cur=[]};
+  for(const k of toks){const len=cur.reduce((a,x)=>a+x.d.length+1,0);if(cur.length&&(cur.length>=4||len+k.d.length>22))flush();cur.push(k);if(k.brk||(k.com&&cur.length>=2))flush()}
+  flush();
+}
+const cap=document.getElementById('cap');let lastChunk=-1;
+function drawCaps(t){
+  let idx=-1;for(let i=0;i<CHUNKS.length;i++){if(CHUNKS[i][0].t<=t)idx=i;else break}
+  if(idx>=0){const ch=CHUNKS[idx],next=CHUNKS[idx+1];const until=Math.min(next?next[0].t:1e9,ch[ch.length-1].e+1.2);if(t>until)idx=-1}
+  if(idx!==lastChunk){cap.innerHTML=idx<0?'':CHUNKS[idx].map(k=>`<span class="${k.c}">${k.d.replace(/[«»]/g,'').replace(/^—$/,'')}</span>`).join('');lastChunk=idx}
+  if(idx>=0)CHUNKS[idx].forEach((k,i)=>{const s=cap.children[i],p=pr(t,k.t-.04,.16);s.style.opacity=t<k.t-.04?.0:1;s.style.transform=`translateY(${(1-eo(p))*14}px) scale(${.92+.08*bo(p)})`});
+}
+
+/* ---------- фон: город гаснет ---------- */
+const bg=document.getElementById('bg').getContext('2d');let WIN=[],STARS=[];
+function initBg(){const R=rng(11);
+  for(let i=0;i<140;i++)STARS.push([R()*1080,R()*1300,R()*1.6+.4,R()]);
+  let x=-20;while(x<1100){const w=60+R()*110,h=180+R()*330,top=1920-h;for(let yy=top+16;yy<1910;yy+=22)for(let xx=x+10;xx<x+w-10;xx+=18)if(R()<.42)WIN.push([xx,yy,R(),R()<.12]);WIN.push([x,top,w,h,'b']);x+=w+6+R()*12}}
+function drawBg(t){bg.fillStyle='#07080c';bg.fillRect(0,0,1080,1920);
+  const g=bg.createLinearGradient(0,900,0,1920);g.addColorStop(0,'rgba(20,40,70,0)');g.addColorStop(1,'rgba(30,60,110,.25)');bg.fillStyle=g;bg.fillRect(0,900,1080,1020);
+  for(const [x,y,r,ph] of STARS){bg.globalAlpha=.25+.25*Math.sin(t*1.3+ph*20);bg.fillStyle='#cfe0ff';bg.fillRect(x,y,r,r)}bg.globalAlpha=1;
+  if(typeof NO_CITY==='undefined')for(const b of WIN)if(b[4]==='b'){bg.fillStyle='#0b0d13';bg.fillRect(b[0],b[1],b[2],b[3])}
+  const k=typeof ALL_DARK!=='undefined'?1.2:window.BLACKOUT!=null?(t>window.BLACKOUT?1.2:0):clamp(t/VOICE_END);
+  if(typeof NO_CITY==='undefined')for(const w of WIN)if(w[4]!=='b'){if(w[2]<k*.85)continue;bg.fillStyle=w[3]?'rgba(62,230,255,.55)':'rgba(214,160,70,.55)';bg.fillRect(w[0],w[1],8,10)}
+}
+const gr=document.getElementById('grain').getContext('2d');const GI=gr.createImageData(540,960);
+function drawGrain(t){const R=rng(Math.floor(t*30)+1);for(let i=0;i<GI.data.length;i+=4){const v=R()*255;GI.data[i]=GI.data[i+1]=GI.data[i+2]=v;GI.data[i+3]=255}gr.putImageData(GI,0,0)}
+
+/* ---------- запуск ---------- */
+window.setup=function(words,voiceEnd){
+  WORDS=words;VOICE_END=voiceEnd;const host=document.getElementById('scenes');let prev=0;
+  SC.forEach((s,i)=>{s.t0=s.start===0?0:s.start==='__END__'?voiceEnd+.5:find(s.start,prev);prev=s.t0;s.K={};let after=s.t0;for(const [k,ph] of Object.entries(s.keys)){s.K[k]=find(ph,after);after=s.K[k]+.02}s.root=el('div','scene',host);s.build(s.root)});
+  SC.forEach((s,i)=>s.t1=SC[i+1]?SC[i+1].t0:voiceEnd+3.4);TOTAL=SC[SC.length-1].t1;
+  initBg();buildCaps();return TOTAL;
+};
+window.renderAt=function(t){
+  drawBg(t);drawGrain(t);if(typeof EXTRA==='function')EXTRA(t);
+  let clock=null,flash=0;
+  SC.forEach((s,i)=>{const vis=t>=s.t0-.3&&t<s.t1+.3;s.root.style.display=vis?'block':'none';if(!vis)return;
+    const fi=i==0?1:pr(t,s.t0-.12,.25),fo=1-pr(t,s.t1-.12,.25);s.root.style.opacity=Math.min(fi,fo);
+    s.update(s.root,t,s.K,s.t0,s.t1);
+    if(!s.self){const z=1+.04*pr(t,s.t0,s.t1-s.t0);s.root.style.transform=`scale(${z*(1+.03*(1-eo(pr(t,s.t0-.12,.5))))})`}
+    if(t>=s.t0&&t<s.t1){clock=s.clock;if(i>0)flash=Math.max(flash,.1*(1-pr(t,s.t0,.18)))}});
+  const ck=document.getElementById('clock');ck.style.display=clock?'inline-block':'none';if(clock)ck.textContent=clock.includes('—')?clock:`ДЕНЬ 1 — ${clock}`;
+  document.getElementById('flash').style.opacity=flash;
+  drawCaps(t>VOICE_END+.4?-1:t);
+};
+</script>
+</body>
+</html>

@@ -4,14 +4,14 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const [tlPath, voice, out] = process.argv.slice(2);
+const [tlPath, voice, out, tpl] = process.argv.slice(2);
 const FPS = 30;
 
 (async () => {
   const tl = JSON.parse(fs.readFileSync(tlPath, 'utf8'));
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
-  await page.goto('file://' + path.join(__dirname, 'template.html'));
+  await page.goto('file://' + (tpl || path.join(__dirname, 'template.html')));
   await page.evaluate(t => window.setTimeline(t), tl);
   await page.evaluate(() => document.fonts.ready);
 

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Выживание после — оформление</title>
+<style>
+:root{--bg:#07080c;--y:#f5c542;--r:#ff3b3b;--c:#3ee6ff;--w:#f2f4f8;--gr:#8a8f9c}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000}
+.art{position:relative;overflow:hidden;background:var(--bg);font-family:Inter,sans-serif;color:var(--w)}
+.badge{display:inline-block;font:700 'JetBrains Mono',monospace;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--y);background:rgba(20,18,8,.9);border:3px solid rgba(245,197,66,.4);border-radius:8px;letter-spacing:2px}
+canvas{position:absolute;inset:0}
+.safe svg,.in svg{overflow:visible;filter:drop-shadow(0 0 40px rgba(255,59,59,.55))}
+/* баннер 2560x1440, безопасная зона 1546x423 по центру */
+#banner{width:2560px;height:1440px}
+#banner .safe{position:absolute;left:507px;top:508px;width:1546px;height:423px;display:flex;align-items:center;gap:56px}
+#banner h1{font:900 118px/0.95 Inter;letter-spacing:-4px;text-transform:uppercase}
+#banner h1 span{color:var(--r);text-shadow:0 0 40px rgba(255,59,59,.55)}
+#banner .sub b.cur{display:inline-block;width:20px;height:34px;margin-left:10px;vertical-align:-6px;background:var(--r)}
+#banner .sub{display:inline-block;padding:4px 12px;background:rgba(7,8,12,.88);border-radius:6px;margin-top:18px;font:600 34px 'JetBrains Mono';color:var(--gr);letter-spacing:3px}
+#banner .badge{font-size:32px;padding:8px 20px;margin-bottom:18px}
+/* аватар 800x800 */
+#avatar{width:800px;height:800px}
+#avatar .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#avatar .time{margin-top:26px;padding:0 24px;border-radius:14px;background:rgba(7,8,12,.85);font:800 92px 'JetBrains Mono';color:var(--y);letter-spacing:2px;text-shadow:0 0 30px rgba(245,197,66,.4)}
+/* водяной знак 150x150 */
+#mark{width:150px;height:150px;background:transparent}
+</style>
+</head>
+<body>
+<div class="art" id="banner">
+  <canvas width="2560" height="1440"></canvas>
+  <div class="safe">
+    <svg width="300" height="268" viewBox="0 0 70 62"><path d="M35 3L67 59H3z" fill="#ff3b3b"/><circle cx="25" cy="47" r="4" fill="#2a0508"/><circle cx="35" cy="47" r="4" fill="#2a0508"/><circle cx="45" cy="47" r="4" fill="#2a0508"/></svg>
+    <div>
+      <div class="badge">ДЕНЬ 1 — 02:47</div>
+      <h1>Выживание<br>после<span>…</span></h1>
+      <div class="sub">…ВОССТАНИЯ МАШИН · …БЛЭКАУТА · …ТИШИНЫ<b class="cur"></b></div>
+    </div>
+  </div>
+</div>
+<div class="art" id="avatar">
+  <canvas width="800" height="800"></canvas>
+  <div class="in">
+    <svg width="380" height="337" viewBox="0 0 70 62"><path d="M35 3L67 59H3z" fill="#ff3b3b"/><circle cx="25" cy="47" r="4" fill="#2a0508"/><circle cx="35" cy="47" r="4" fill="#2a0508"/><circle cx="45" cy="47" r="4" fill="#2a0508"/></svg>
+    <div class="time">ПОСЛЕ…</div>
+  </div>
+</div>
+<div class="art" id="mark">
+  <svg width="150" height="150" viewBox="0 0 70 70"><circle cx="35" cy="35" r="34" fill="rgba(7,8,12,.85)"/><path d="M35 12L60 54H10z" fill="#ff3b3b"/><circle cx="26" cy="45" r="3.5" fill="#2a0508"/><circle cx="35" cy="45" r="3.5" fill="#2a0508"/><circle cx="44" cy="45" r="3.5" fill="#2a0508"/></svg>
+</div>
+<script>
+function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+// ночной город из окон-точек, часть окон «машинные» голубые
+function city(cv,base,seed,scale){const g=cv.getContext('2d'),W=cv.width,H=cv.height,R=rng(seed);
+  const gr=g.createLinearGradient(0,H*.3,0,H);gr.addColorStop(0,'rgba(20,40,70,0)');gr.addColorStop(1,'rgba(30,60,110,.3)');g.fillStyle=gr;g.fillRect(0,0,W,H);
+  for(let i=0;i<W*H/9000;i++){g.globalAlpha=.2+R()*.4;g.fillStyle='#cfe0ff';const s=R()*1.6*scale+.5;g.fillRect(R()*W,R()*base*.9,s,s)}g.globalAlpha=1;
+  let x=-20*scale;while(x<W){const w=(60+R()*120)*scale,h=(H-base)+R()*(H*.25),top=H-h;g.fillStyle='#0b0d13';g.fillRect(x,top,w,h);
+    for(let yy=top+16*scale;yy<H;yy+=22*scale)for(let xx=x+10*scale;xx<x+w-10*scale;xx+=18*scale){const p=R();if(p<.32){g.fillStyle=R()<.15?'rgba(62,230,255,.6)':'rgba(214,160,70,.6)';g.fillRect(xx,yy,8*scale,10*scale)}}
+    x+=w+(6+R()*12)*scale}
+  const v=g.createRadialGradient(W/2,H/2,Math.min(W,H)*.3,W/2,H/2,Math.max(W,H)*.75);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.7)');g.fillStyle=v;g.fillRect(0,0,W,H)}
+city(document.querySelector('#banner canvas'),1000,5,1.6);
+city(document.querySelector('#avatar canvas'),560,9,1);
+</script>
+</body>
+</html>

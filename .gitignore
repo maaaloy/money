@@ -1,3 +1,4 @@
 video/out/
 video/voices/
 *.wav
+__pycache__/

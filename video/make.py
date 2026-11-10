@@ -52,10 +52,29 @@ def main(story_path):
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", str(lst),
                     "-af", "loudnorm=I=-14:TP=-1.5", "-ar", "44100", str(voice)], check=True)
 
+    if story.get("ambient"):
+        # тихий низкий гул + синтезированные удары в дверь (scene.knocks, сек от начала сцены)
+        knocks = [sc["start"] + k for sc in story["scenes"] for k in sc.get("knocks", [])]
+        inputs = ["-i", str(voice), "-f", "lavfi", "-t", str(story["duration"]),
+                  "-i", "anoisesrc=color=brown:amplitude=0.5:r=44100"]
+        filt = ["[1]lowpass=f=180,volume=0.10[amb]"]
+        mix = ["[0]", "[amb]"]
+        for j, k in enumerate(knocks):
+            inputs += ["-f", "lavfi", "-t", "0.35", "-i",
+                       "aevalsrc='(sin(2*PI*65*t)+0.6*sin(2*PI*130*t))*exp(-22*t)':s=44100"]
+            filt.append(f"[{j + 2}]volume=0.9,adelay={int(k * 1000)}:all=1[k{j}]")
+            mix.append(f"[k{j}]")
+        filt.append("".join(mix) + f"amix=inputs={len(mix)}:normalize=0:duration=first,alimiter=limit=0.95[a]")
+        mixed = out / "mixed.wav"
+        subprocess.run(["ffmpeg", "-v", "error", "-y", *inputs, "-filter_complex", ";".join(filt),
+                        "-map", "[a]", "-ac", "1", str(mixed)], check=True)
+        voice = mixed
+
     tl = out / "timeline.json"
     tl.write_text(json.dumps(story, ensure_ascii=False))
     mp4 = ROOT / "out" / f"{story['id']}.mp4"
-    subprocess.run(["node", str(ROOT / "render.js"), str(tl), str(voice), str(mp4)], check=True)
+    tpl = ROOT / story.get("template", "template.html")
+    subprocess.run(["node", str(ROOT / "render.js"), str(tl), str(voice), str(mp4), str(tpl)], check=True)
     print(mp4)
 
 

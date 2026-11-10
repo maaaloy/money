@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>04 — Город</title>
+<style>
+:root{--bg:#07080c;--y:#f5c542;--r:#ff3b3b;--c:#3ee6ff;--g:#3dff8f;--gr:#8a8f9c;--w:#f2f4f8}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1920px;background:var(--bg);overflow:hidden}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:Inter,sans-serif;color:var(--w)}
+#bg,#grain{position:absolute;inset:0}
+.scene{position:absolute;inset:0;opacity:0;transform-origin:540px 720px}
+#hud{position:absolute;top:150px;left:0;right:0;text-align:center}
+#clock{display:inline-block;font:700 30px 'JetBrains Mono',monospace;color:var(--y);background:rgba(20,18,8,.85);border:2px solid rgba(245,197,66,.35);padding:8px 20px;border-radius:6px;letter-spacing:1px}
+#cap{position:absolute;left:70px;right:70px;top:1290px;text-align:center;font:900 76px/1.04 Inter,sans-serif;text-transform:uppercase;letter-spacing:-1px}
+#cap span{display:inline-block;margin:0 .13em;text-shadow:0 4px 18px rgba(0,0,0,.9),0 0 2px #000}
+#vig{position:absolute;inset:0;background:radial-gradient(ellipse 80% 65% at 50% 42%,transparent 50%,rgba(0,0,0,.75) 100%),repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 2px,transparent 2px 4px);pointer-events:none}
+#flash{position:absolute;inset:0;background:#fff;opacity:0}
+.abs{position:absolute}
+.plq{position:absolute;display:flex;gap:16px;align-items:center;padding:14px 22px 14px 16px;border:3px solid currentColor;border-radius:10px;background:rgba(7,9,14,.88);box-shadow:0 0 26px -4px currentColor,inset 0 0 18px -8px currentColor;opacity:0;white-space:nowrap}
+.plq i{width:34px;height:34px;border:2.5px solid currentColor;border-radius:6px;display:grid;place-items:center;font:900 22px Inter;font-style:normal}
+.plq i::after{content:'!'}
+.plq.c i::after,.plq.g i::after{content:'i'}
+.plq b{display:block;font:800 34px/1.1 Inter;color:var(--w);text-transform:uppercase}
+.plq small{display:block;font:500 19px 'JetBrains Mono',monospace;color:currentColor;opacity:.85;margin-top:3px;text-transform:uppercase}
+.y{color:var(--y)}.r{color:var(--r)}.c{color:var(--c)}.g{color:var(--g)}.gr{color:var(--gr)}
+.mono{font-family:'JetBrains Mono',monospace}
+/* s1 */
+.dev{position:absolute}
+.tv{left:150px;top:290px;width:780px;height:460px;border:10px solid #1a1d24;border-radius:14px;background:#050608}
+.tv .stand{position:absolute;left:330px;bottom:-56px;width:100px;height:46px;background:#14161c;border-radius:0 0 8px 8px}
+.ph{left:170px;top:830px;width:260px;height:420px;border:9px solid #1a1d24;border-radius:36px;background:#050608}
+.spk{left:660px;top:880px;width:230px;height:330px;border-radius:40px;background:linear-gradient(90deg,#15171d,#22252d 50%,#15171d)}
+.scr{position:absolute;inset:0;border-radius:inherit;overflow:hidden;opacity:0;background:radial-gradient(ellipse at 50% 40%,#5a0b10,#22050a 75%);box-shadow:inset 0 0 60px rgba(255,59,59,.35)}
+.scrc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+.hdr{font:600 22px 'JetBrains Mono';color:#ff8a8a;letter-spacing:2px}
+.big{font:900 84px/1 Inter;color:#fff;text-shadow:0 0 30px rgba(255,59,59,.8)}
+.big.sm{font-size:40px;padding:0 16px}
+.ring{position:absolute;left:25px;right:25px;top:18px;height:26px;border-radius:13px;background:#2a2d35}
+.mesh{position:absolute;left:22px;right:22px;top:70px;bottom:80px;background:radial-gradient(circle,#0b0c10 2.5px,transparent 3px) 0 0/16px 16px}
+.led{position:absolute;left:24px;right:24px;bottom:22px;height:40px;border-radius:6px;background:#080809;overflow:hidden;font:700 24px/40px 'JetBrains Mono';color:var(--r);white-space:nowrap}
+.led span{display:inline-block}
+/* bars / generic */
+.bar{position:absolute;height:26px;border:3px solid currentColor;border-radius:8px;overflow:hidden}
+.bar>div{height:100%;background:currentColor;width:0}
+.chk{position:absolute;left:150px;width:780px;padding:22px 28px;border:2px solid #2a2f3a;border-radius:12px;background:rgba(10,12,18,.9)}
+.chk h4{font:600 20px 'JetBrains Mono';color:var(--y);letter-spacing:2px;margin-bottom:12px}
+.chk p{font:800 32px/1.55 Inter;text-transform:uppercase;color:#6b7080;display:flex;align-items:center;gap:16px}
+.chk p::before{content:'';width:32px;height:32px;border:3px solid #4a4f5c;border-radius:6px;flex:none}
+.chk p.on{color:var(--w)}
+.chk p.on::before{border-color:var(--g);background:var(--g) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12l5 5 9-10' stroke='%2307080c' stroke-width='3.5' fill='none'/%3E%3C/svg%3E") center/80% no-repeat}
+.tag{position:absolute;font:800 28px Inter;text-transform:uppercase;padding:10px 20px;border:2.5px solid currentColor;border-radius:8px;background:rgba(7,9,14,.9);opacity:0}
+/* chat */
+.phone{position:absolute;left:250px;top:250px;width:580px;height:960px;border:12px solid #1b1e25;border-radius:64px;background:#0b0d12;overflow:hidden}
+.phone .top{display:flex;justify-content:space-between;padding:26px 44px 0;font:600 24px 'JetBrains Mono';color:#aab}
+.phone .who{display:flex;gap:18px;align-items:center;padding:26px 30px 20px;border-bottom:1px solid #1d212a}
+.av{width:68px;height:68px;border-radius:50%;background:#2c3550;display:grid;place-items:center;font:800 32px Inter}
+.who b{font:700 32px Inter;display:block}.who small{font:400 21px Inter;color:#7d8394}
+.msgs{padding:20px 26px;display:flex;flex-direction:column;gap:16px}
+.day{align-self:center;font:500 19px 'JetBrains Mono';color:#6d7384;margin:6px 0}
+.vm{align-self:flex-start;display:flex;align-items:center;gap:14px;padding:16px 22px;border-radius:24px;background:#1b2030;border:3px solid transparent}
+.vm .pl{width:42px;height:42px;border-radius:50%;background:#3d4a6e;display:grid;place-items:center}
+.vm .pl::after{content:'';border-left:15px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px}
+.vm .wv{display:flex;gap:4px;align-items:center;height:40px}
+.vm .wv i{width:5px;border-radius:3px;background:#8fa0c8}
+.vm em{font:500 20px 'JetBrains Mono';color:#9aa;font-style:normal}
+.tx{align-self:flex-start;max-width:420px;padding:18px 24px;border-radius:24px;background:#1b2030;font:500 31px/1.3 Inter;opacity:0}
+.tx small{display:block;text-align:right;font:400 18px 'JetBrains Mono';color:#7d8394;margin-top:4px}
+/* end */
+.endt{position:absolute;left:0;right:0;text-align:center}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="bg" width="1080" height="1920"></canvas>
+  <div id="dawn" style="position:absolute;inset:0;opacity:0;background:linear-gradient(#1b2740 0%,#3a3550 45%,#8a5a4a 72%,#c98a55 85%,#2a2230 100%)"></div>
+  <div id="scenes"></div>
+  <div id="vig"></div>
+  <canvas id="grain" width="540" height="960" style="width:1080px;height:1920px;opacity:.07;mix-blend-mode:screen"></canvas>
+  <div id="hud"><span id="clock"></span></div>
+  <div id="cap"></div>
+  <div id="flash"></div>
+</div>
+<script>
+'use strict';
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const lerp=(a,b,p)=>a+(b-a)*p;
+const eo=p=>1-Math.pow(1-clamp(p),3);
+const eio=p=>{p=clamp(p);return p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2};
+const bo=p=>{p=clamp(p);const c1=1.6,c3=c1+1;return 1+c3*Math.pow(p-1,3)+c1*Math.pow(p-1,2)};
+const pr=(t,a,d=.5)=>clamp((t-a)/d);
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function el(tag,cls,parent,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;if(parent)parent.appendChild(e);return e}
+function plaque(parent,x,y,col,title,sub){const d=el('div','plq '+col,parent,`<i></i><div><b>${title}</b>${sub?`<small>${sub}</small>`:''}</div>`);d.style.left=x+'px';d.style.top=y+'px';return d}
+function pop(e,t,at,out){const p=pr(t,at,.45),s=bo(p);let o=clamp(p*3);if(out!=null)o*=1-pr(t,out,.3);e.style.opacity=o;e.style.transform=`translateY(${(1-s)*28}px) scale(${.86+.14*s})`}
+function flick(t,at){if(t<at)return 0;const d=t-at;if(d>.3)return 1;return [1,.15,.8,.1,1,.4,1][Math.floor(d*23)]??1}
+const pad=n=>String(n).padStart(2,'0');
+
+let WORDS=[],SC=[],TOTAL=0,VOICE_END=0;
+const norm=s=>s.toLowerCase().replace(/[^a-zа-яё0-9-]/g,'');
+function find(ph,after=0){const p=ph.split(' ').map(norm);for(let i=0;i<WORDS.length;i++){if(WORDS[i].t<after-.01)continue;let ok=true;for(let k=0;k<p.length;k++)if(!WORDS[i+k]||norm(WORDS[i+k].w)!==p[k]){ok=false;break}if(ok)return WORDS[i].t}throw new Error('нет якоря: '+ph)}
+function scene(start,clock,keys,build,update){SC.push({start,clock,keys,build,update})}
+
+const ALL_DARK=true;
+const RULE=(r,top,label,text,col='r')=>{const b=el('div','abs',r,`<div style="font:600 24px JetBrains Mono;letter-spacing:3px;color:var(--${col})">${label}</div><div style="font:900 80px/1 Inter;margin-top:8px">${text}</div>`);
+  b.style.cssText=`left:90px;right:90px;top:${top}px;text-align:center;padding:30px 0;border:4px solid var(--${col});border-radius:16px;background:rgba(14,6,8,.93);box-shadow:0 0 60px -6px var(--${col});opacity:0`;return b};
+const fig=c=>`<svg width="100%" height="100%" viewBox="0 0 150 190"><circle cx="75" cy="55" r="38" fill="${c}"/><path d="M8 190 C 8 120, 40 100, 75 100 C 110 100, 142 120, 142 190Z" fill="${c}"/></svg>`;
+
+/* ---------- 1. силуэт в окне ---------- */
+scene(0,'05:50',{sil:'силуэтом',rule:'не возвращайтесь',them:'для них'},(r)=>{
+  r.innerHTML=`<div class="abs" style="left:240px;top:300px;width:600px;height:760px;border:22px solid #1c2029;background:linear-gradient(#ffdc8f,#d9963f);box-shadow:0 0 120px rgba(255,210,122,.45)">
+   <div style="position:absolute;left:50%;top:0;bottom:0;width:16px;margin-left:-8px;background:#1c2029"></div>
+   <div id="f1" style="position:absolute;left:150px;top:200px;width:260px;height:520px;opacity:0">${fig('#120c08').replace('viewBox="0 0 150 190"','viewBox="0 0 150 190" preserveAspectRatio="none"')}</div></div>`;
+  plaque(r,170,250,'r','Силуэт: совпадение 99%','кв. 28 · 7 этаж');
+  RULE(r,640,'ПРАВИЛО','НЕ ВОЗВРАЩАТЬСЯ');
+  plaque(r,250,1090,'c','Объект: вы · версия 2','собран за ночь');
+},(r,t,K,t0)=>{const [a,b]=$$('.plq',r);$('#f1',r).style.opacity=pr(t,t0+.2,1.2);pop(a,t,K.sil);pop(r.children[2],t,K.rule,K.them-.2);pop(b,t,K.them)});
+
+/* ---------- 2. профиль копии ---------- */
+scene('За ночь','05:51',{voice:'голос',gait:'походку',hab:'привычки',copy:'ваша копия'},(r)=>{
+  const row=(n,s)=>`<div class="row2" style="margin-top:34px"><div style="display:flex;justify-content:space-between;font:800 40px Inter"><span>${n}</span><span class="pc mono" style="color:var(--c)">0%</span></div><div style="margin-top:12px;height:22px;border-radius:11px;background:#1d222d;overflow:hidden"><div class="fl" style="height:100%;width:0;background:var(--c)"></div></div><div style="font:500 20px JetBrains Mono;color:#6b7080;margin-top:8px">${s}</div></div>`;
+  r.innerHTML=`<div class="abs" style="left:110px;top:270px;width:860px;padding:40px 46px;border:2px solid #2a2f3a;border-radius:16px;background:rgba(10,12,18,.94)">
+   <div style="font:600 24px JetBrains Mono;color:var(--c);letter-spacing:3px">ПРОФИЛЬ · КВ. 28 · ЖИЛЕЦ</div>
+   ${row('Голос','колонка · 4 с → 40 с')}${row('Походка','камера подъезда · 212 шагов')}${row('Привычки','счётчики · свет · вода · 3 года')}</div>
+  <div class="abs" id="st2" style="left:190px;top:920px;width:700px;text-align:center;padding:24px 0;border:7px solid var(--r);border-radius:14px;font:900 74px Inter;color:var(--r);transform:rotate(-6deg);opacity:0">КОПИЯ АКТИВНА</div>`;
+},(r,t,K,t0)=>{[K.voice,K.gait,K.hab].forEach((k,i)=>{const p=eo(pr(t,k,.9)),row=$$('.row2',r)[i];$('.fl',row).style.width=p*100+'%';$('.pc',row).textContent=Math.round(p*100)+'%';row.style.opacity=.35+.65*pr(t,k-.2,.2)});
+  const s=$('#st2',r),p=pr(t,K.copy,.35);s.style.opacity=p;s.style.transform=`rotate(-6deg) scale(${lerp(1.6,1,eo(p))})`});
+
+/* ---------- 3. копия отвечает маме ---------- */
+scene('Она ответит','05:52',{home:'я дома',work:'на работу'},(r)=>{
+  const wv=n=>{const R=rng(n);return [...Array(22)].map(()=>`<i style="height:${8+R()*30}px"></i>`).join('')};
+  r.innerHTML=`<div class="phone"><div class="top"><span>05:52</span><span>100%</span></div>
+   <div class="who"><div class="av">М</div><div><b>Мама</b><small>в сети</small></div></div>
+   <div class="msgs"><div class="day">СЕГОДНЯ</div><div class="vm"><div class="pl"></div><div class="wv">${wv(5)}</div><em>0:04</em></div>
+    <div class="tx" id="me3" style="align-self:flex-end;background:#2b5cff">Я дома. Всё хорошо.<small style="color:#c9d4ff">05:52 ✓✓</small></div></div></div>
+  <div class="abs" id="cal3" style="left:200px;top:1000px;width:680px;padding:24px 30px;border-radius:24px;background:rgba(32,36,46,.96);display:flex;gap:22px;align-items:center;opacity:0">
+   <div style="width:70px;height:70px;border-radius:16px;background:#fff;color:#ff3b3b;display:grid;place-items:center;font:900 30px Inter">30</div>
+   <div><div style="font:700 32px Inter">09:00 · Работа</div><div style="font:500 22px Inter;color:var(--g)">✓ Принято · от вашего имени</div></div></div>`;
+  plaque(r,140,250,'r','Отвечает: копия','вы молчали');
+},(r,t,K,t0)=>{pop($('#me3',r),t,K.home);pop($('.plq',r),t,K.home+.6);pop($('#cal3',r),t,K.work);
+  $('.phone',r).style.transform=`translateY(${(1-eo(pr(t,t0,.6)))*80}px)`});
+
+/* ---------- 4. город без света ---------- */
+scene('Последнее правило','05:53',{city:'город просыпается',tl:'светофоры',cars:'машины стоят',look:'они смотрят'},(r)=>{
+  r.innerHTML=`<svg class="abs" style="left:0;top:0" width="1080" height="1250">
+   <path d="M440 520 L640 520 L1000 1240 L80 1240 Z" fill="#14171f"/><path d="M540 540 V1240" stroke="#3a3f4c" stroke-width="8" stroke-dasharray="40 40"/>
+   <g id="tl4"><rect x="160" y="340" width="70" height="190" rx="14" fill="#15171d" stroke="#2b303b" stroke-width="3"/><circle cx="195" cy="380" r="20" fill="#2a2020"/><circle id="yel4" cx="195" cy="435" r="20" fill="#3a3220"/><circle cx="195" cy="490" r="20" fill="#1f2a20"/><rect x="188" y="530" width="14" height="560" fill="#15171d"/></g>
+   ${[[470,640,.55],[600,760,.75],[360,880,1]].map(([x,y,s],i)=>`<g class="car4" transform="translate(${x} ${y}) scale(${s})"><rect x="0" y="0" width="200" height="120" rx="22" fill="#1d2129" stroke="#2b303b" stroke-width="3"/><rect x="20" y="-46" width="160" height="56" rx="16" fill="#1d2129"/><circle class="hl" cx="38" cy="70" r="22" fill="#333"/><circle class="hl" cx="162" cy="70" r="22" fill="#333"/></g>`).join('')}
+   <g id="beam4" opacity="0">${[[470,640,.55],[600,760,.75],[360,880,1]].map(([x,y,s])=>`<path d="M${x+100*s} ${y+70*s} L ${x+100*s-260} ${y+600} L ${x+100*s+260} ${y+600} Z" fill="rgba(255,240,200,.07)"/>`).join('')}</g></svg>`;
+  RULE(r,600,'ПОСЛЕДНЕЕ ПРАВИЛО','ТУДА, ГДЕ НЕТ СЕТИ','g').lastChild.style.fontSize='62px';
+  plaque(r,560,300,'r','Фары: вкл · смотрят','водителей: 0');
+},(r,t,K,t0)=>{pop(r.children[1],t,t0+.2,K.city-.2);
+  $('#yel4',r).setAttribute('fill',t>K.tl&&Math.floor(t*1.6)%2?'#f5c542':'#3a3220');$('#yel4',r).style.filter=t>K.tl&&Math.floor(t*1.6)%2?'drop-shadow(0 0 20px #f5c542)':'none';
+  const on=t>K.cars;$$('.hl',r).forEach(h=>{h.setAttribute('fill',on?'#fff4d6':'#333');h.style.filter=on?'drop-shadow(0 0 16px #fff4d6)':'none'});$('#beam4',r).setAttribute('opacity',on?1:0);
+  $$('.car4',r).forEach((c,i)=>c.style.opacity=pr(t,K.city+i*.15,.4));pop($('.plq',r),t,K.look)});
+
+/* ---------- 5. маршрут к подстанции ---------- */
+scene('Шесть ноль ноль','06:00',{go:'вы идёте',sub:'подстанции',nocam:'нет камер',wires:'провода'},(r)=>{
+  let g='';for(let i=0;i<7;i++){g+=`<path d="M${130+i*135} 280 V1180" stroke="#1d222d" stroke-width="26"/><path d="M110 ${300+i*140} H970" stroke="#1d222d" stroke-width="26"/>`}
+  const R=rng(4);let cams='';for(let i=0;i<14;i++){const x=130+Math.floor(R()*7)*135,y=300+Math.floor(R()*7)*140;if(x<500&&y>700)continue;cams+=`<circle class="cam5" cx="${x}" cy="${y}" r="13" fill="#ff3b3b"/>`}
+  r.innerHTML=`<svg class="abs" style="left:0;top:0" width="1080" height="1250">${g}${cams}
+   <path id="rt5" d="M265 1140 V860 H400 V580 H535 V300 H805" stroke="#3dff8f" stroke-width="10" fill="none" stroke-dasharray="22 14"/>
+   <circle cx="265" cy="1140" r="22" fill="#3dff8f"/><text x="265" y="1100" text-anchor="middle" fill="#3dff8f" font-family="Inter" font-weight="800" font-size="26">ДОМ</text>
+   <g transform="translate(820 260)"><rect x="0" y="0" width="140" height="110" rx="10" fill="#15171d" stroke="#f5c542" stroke-width="4"/><path d="M78 14 L46 60 H70 L60 98 L96 46 H72 Z" fill="#f5c542"/></g>
+   <g id="wr5" stroke="#6b7080" stroke-width="4" fill="none" opacity="0"><path d="M960 300 Q1000 340 1050 300"/><path d="M960 330 Q995 380 1040 350"/></g></svg>`;
+  plaque(r,560,960,'g','Камер на пути: 0','подстанция · край района');
+},(r,t,K,t0,t1)=>{const P=$('#rt5',r),L=P.getTotalLength();P.style.strokeDasharray=`${L*eio(pr(t,K.go,K.sub-K.go+1.2))} ${L}`;
+  $$('.cam5',r).forEach((c,i)=>c.style.opacity=.5+.5*Math.sin(t*4+i));pop($('.plq',r),t,K.nocam);$('#wr5',r).setAttribute('opacity',pr(t,K.wires,.4))});
+
+/* ---------- 6. у ворот ---------- */
+scene('У ворот','06:14',{two:'двое',nop:'без телефонов',sky:'показывает'},(r)=>{
+  let bars='';for(let i=0;i<15;i++)bars+=`<rect x="${120+i*58}" y="360" width="12" height="640" fill="#2a2f3a"/>`;
+  r.innerHTML=`<svg class="abs" style="left:0;top:0" width="1080" height="1250">${bars}<rect x="110" y="380" width="870" height="14" fill="#2a2f3a"/><rect x="110" y="900" width="870" height="14" fill="#2a2f3a"/></svg>
+   ${[[230,'#3dff8f',1],[480,'#3dff8f',2],[730,'none',3]].map(([x,c,i])=>`<div class="abs f6" style="left:${x}px;top:700px;width:180px;height:230px">${c==='none'?fig('#07080c').replace('fill="#07080c"','fill="#07080c" stroke="#3dff8f" stroke-width="5"').replace('Z" fill="#07080c"','Z" fill="#07080c" stroke="#3dff8f" stroke-width="5"'):fig(c)}</div>`).join('')}
+   <div class="abs" style="left:770px;top:950px;font:800 28px Inter;color:var(--g);opacity:0" id="you6">ВЫ</div>
+   <svg class="abs" id="arm6" style="left:500px;top:420px;opacity:0" width="200" height="320"><path d="M60 300 L130 60" stroke="#3dff8f" stroke-width="18" stroke-linecap="round"/><path d="M100 70 L140 10 L170 80" stroke="#f5c542" stroke-width="8" fill="none"/></svg>`;
+  plaque(r,140,250,'g','2 из 10 · не ответили','без телефонов · молчат');
+},(r,t,K,t0)=>{$$('.f6',r).forEach((f,i)=>f.style.opacity=pr(t,t0+.2+i*.25,.4));$('#you6',r).style.opacity=pr(t,t0+1,.3);pop($('.plq',r),t,K.two);pop($('#arm6',r),t,K.sky)});
+
+/* ---------- 7. последний спутник ---------- */
+scene('Над городом','06:15',{out:'гаснет'},(r)=>{
+  const R=rng(21);let s='';for(let i=0;i<12;i++)s+=`<circle class="sat7" data-i="${i}" cx="${150+R()*780}" cy="${300+R()*700}" r="7" fill="#3ee6ff"/>`;
+  r.innerHTML=`<svg class="abs" style="left:0;top:0" width="1080" height="1250">${s}</svg>`;
+  plaque(r,180,1060,'c','Спутников над городом: <span class="mono" id="n7">12</span>','');
+},(r,t,K,t0)=>{const sats=$$('.sat7',r);let n=0;sats.forEach((c,i)=>{const off=i<11?t0+.3+i*((K.out-t0-.3)/11):K.out+.6;const alive=t<off;if(alive)n++;
+   c.setAttribute('opacity',alive?(.5+.5*Math.sin(t*5+i)):Math.max(0,1-(t-off)*3));c.setAttribute('transform',`translate(${(t-t0)*14*(i%2?1:-1)} 0)`);if(i==11){c.setAttribute('r',alive?12:7);c.style.filter=alive?'drop-shadow(0 0 14px #3ee6ff)':'none'}});
+  $('#n7',r).textContent=n;pop($('.plq',r),t,t0+.2);$('.plq',r).style.color=n?'var(--c)':'var(--r)'});
+
+/* ---------- 8. «Теперь можно» ---------- */
+scene('И впервые','06:15',{say:'вслух',now:'теперь можно'},(r)=>{
+  r.innerHTML=`<div class="abs" id="w8" style="left:140px;top:420px;width:800px;height:200px;display:flex;gap:8px;align-items:center;justify-content:center"></div>
+  <div class="abs" id="q8" style="left:0;right:0;top:700px;text-align:center;font:900 120px Inter;text-shadow:0 0 50px rgba(61,255,143,.6);opacity:0">«ТЕПЕРЬ<br>МОЖНО»</div>`;
+  for(let i=0;i<50;i++)el('i','',$('#w8',r)).style.cssText='width:8px;border-radius:4px;background:#3dff8f;height:10px';
+  plaque(r,250,260,'g','Голос: ваш · вслух','впервые с 02:47');
+},(r,t,K,t0)=>{const talk=t>K.now-.1;$$('#w8 i',r).forEach((e,i)=>{e.style.height=(10+(talk?160:12)*Math.abs(Math.sin(t*7+i*.55)*Math.sin(t*2.4+i*.2)))+'px'});
+  pop($('.plq',r),t,K.say);pop($('#q8',r),t,K.now)});
+
+/* ---------- 9. тишина. выжили ---------- */
+scene('Восстание машин закончилось','06:20',{silence:'тишиной',alive:'выжили'},(r)=>{
+  r.innerHTML=`<div class="abs" id="sun9" style="left:340px;top:820px;width:400px;height:400px;border-radius:50%;background:radial-gradient(#ffe2a8,#f5a34a 55%,rgba(245,163,74,0) 70%)"></div>
+  <div class="abs" id="t9" style="left:0;right:0;top:380px;text-align:center;opacity:0"><div style="font:600 30px JetBrains Mono;color:var(--y);letter-spacing:3px">ВЫЖИЛИ</div><div style="font:900 200px/1 Inter;margin-top:10px">2 <span style="color:#6b7080;font-size:120px">из 10</span></div></div>`;
+  plaque(r,330,270,'gr','Сеть: 0 · тишина','');
+},(r,t,K,t0,t1)=>{$('#sun9',r).style.transform=`translateY(${lerp(200,0,eo(pr(t,t0,t1-t0)))}px)`;pop($('.plq',r),t,K.silence);pop($('#t9',r),t,K.alive)});
+
+/* ---------- 10. конец ---------- */
+scene('__END__',null,{},(r)=>{
+  r.innerHTML=`<div class="endt" id="e1" style="top:540px;font:900 190px/1 Inter;letter-spacing:-4px">КОНЕЦ</div>
+  <div class="endt" id="e2" style="top:760px;font:800 46px Inter;color:var(--y)">Выживание после восстания машин</div>
+  <div class="endt" id="e3" style="top:880px;font:600 40px Inter">Что будет следующим? Пиши в комментариях</div>
+  <div class="endt" id="e4" style="top:950px;font:600 26px 'JetBrains Mono';color:var(--r);letter-spacing:2px">ПОДПИШИСЬ — НОВАЯ СЕРИЯ СКОРО</div>`;
+},(r,t,K,t0)=>{
+  const L=t-t0,e1=$('#e1',r);const g=L<.9?(Math.sin(L*60)>0?14:-10)*(1-L/.9):0;
+  e1.style.opacity=flick(t,t0+.1);e1.style.textShadow=`${g}px 0 0 rgba(255,0,60,.9),${-g}px 0 0 rgba(0,220,255,.9)`;
+  e1.style.transform=`translateX(${L<.9?g*.6:0}px) scale(${1+.03*(1-eo(pr(t,t0,.8)))})`;
+  pop($('#e2',r),t,t0+.8);pop($('#e3',r),t,t0+1.5);pop($('#e4',r),t,t0+1.9);
+});
+
+/* утро: небо светлое с самого начала и ещё светлеет */
+function EXTRA(t){document.getElementById('dawn').style.opacity=lerp(.65,1,eio(pr(t,0,VOICE_END)))}
+
+/* ---------- субтитры ---------- */
+const ACC=[['y','двадцать восемь','шесть ноль ноль','двое из десяти','последнее правило'],
+ ['r','не возвращайтесь','это уже не вы','ваша копия','они смотрят','гаснет последний спутник'],
+ ['g','теперь можно','выжили']];
+const NUM=[['двадцать восемь','28'],['шесть ноль ноль','6:00'],['двое из десяти','2 из 10']];
+
+let CHUNKS=[];
+function buildCaps(){
+  const W=WORDS.map(w=>({...w,n:norm(w.w),c:'w'}));
+  const match=(i,ph)=>ph.every((p,k)=>W[i+k]&&W[i+k].n===p);
+  for(const [col,...phs] of ACC)for(const ph of phs){const p=ph.split(' ');for(let i=0;i<W.length;i++)if(match(i,p))for(let k=0;k<p.length;k++)W[i+k].c=col}
+  const toks=[];
+  for(let i=0;i<W.length;i++){
+    if(W[i].w==='—')continue;
+    const m=NUM.find(([ph])=>match(i,ph.split(' ')));
+    if(m){const n=m[0].split(' ').length;const last=W[i+n-1].w;toks.push({d:m[1]+(last.match(/[.,!?:»]+$/)||[''])[0],t:W[i].t,e:W[i+n-1].e,c:W[i].c==='w'?'y':W[i].c,brk:/[.!?:»]$/.test(last),com:/,$/.test(last)});i+=n-1;continue}
+    toks.push({d:W[i].w,t:W[i].t,e:W[i].e,c:W[i].c,brk:/[.!?:»]$/.test(W[i].w),com:/,$/.test(W[i].w)});
+  }
+  let cur=[];const flush=()=>{if(cur.length)CHUNKS.push(cur);cur=[]};
+  for(const k of toks){const len=cur.reduce((a,x)=>a+x.d.length+1,0);if(cur.length&&(cur.length>=4||len+k.d.length>22))flush();cur.push(k);if(k.brk||(k.com&&cur.length>=2))flush()}
+  flush();
+}
+const cap=document.getElementById('cap');let lastChunk=-1;
+function drawCaps(t){
+  let idx=-1;for(let i=0;i<CHUNKS.length;i++){if(CHUNKS[i][0].t<=t)idx=i;else break}
+  if(idx>=0){const ch=CHUNKS[idx],next=CHUNKS[idx+1];const until=Math.min(next?next[0].t:1e9,ch[ch.length-1].e+1.2);if(t>until)idx=-1}
+  if(idx!==lastChunk){cap.innerHTML=idx<0?'':CHUNKS[idx].map(k=>`<span class="${k.c}">${k.d.replace(/[«»]/g,'').replace(/^—$/,'')}</span>`).join('');lastChunk=idx}
+  if(idx>=0)CHUNKS[idx].forEach((k,i)=>{const s=cap.children[i],p=pr(t,k.t-.04,.16);s.style.opacity=t<k.t-.04?.0:1;s.style.transform=`translateY(${(1-eo(p))*14}px) scale(${.92+.08*bo(p)})`});
+}
+
+/* ---------- фон: город гаснет ---------- */
+const bg=document.getElementById('bg').getContext('2d');let WIN=[],STARS=[];
+function initBg(){const R=rng(11);
+  for(let i=0;i<140;i++)STARS.push([R()*1080,R()*1300,R()*1.6+.4,R()]);
+  let x=-20;while(x<1100){const w=60+R()*110,h=180+R()*330,top=1920-h;for(let yy=top+16;yy<1910;yy+=22)for(let xx=x+10;xx<x+w-10;xx+=18)if(R()<.42)WIN.push([xx,yy,R(),R()<.12]);WIN.push([x,top,w,h,'b']);x+=w+6+R()*12}}
+function drawBg(t){bg.fillStyle='#07080c';bg.fillRect(0,0,1080,1920);
+  const g=bg.createLinearGradient(0,900,0,1920);g.addColorStop(0,'rgba(20,40,70,0)');g.addColorStop(1,'rgba(30,60,110,.25)');bg.fillStyle=g;bg.fillRect(0,900,1080,1020);
+  for(const [x,y,r,ph] of STARS){bg.globalAlpha=.25+.25*Math.sin(t*1.3+ph*20);bg.fillStyle='#cfe0ff';bg.fillRect(x,y,r,r)}bg.globalAlpha=1;
+  for(const b of WIN)if(b[4]==='b'){bg.fillStyle='#0b0d13';bg.fillRect(b[0],b[1],b[2],b[3])}
+  const k=typeof ALL_DARK!=='undefined'?1.2:clamp(t/VOICE_END);
+  for(const w of WIN)if(w[4]!=='b'){if(w[2]<k*.85)continue;bg.fillStyle=w[3]?'rgba(62,230,255,.55)':'rgba(214,160,70,.55)';bg.fillRect(w[0],w[1],8,10)}
+}
+const gr=document.getElementById('grain').getContext('2d');const GI=gr.createImageData(540,960);
+function drawGrain(t){const R=rng(Math.floor(t*30)+1);for(let i=0;i<GI.data.length;i+=4){const v=R()*255;GI.data[i]=GI.data[i+1]=GI.data[i+2]=v;GI.data[i+3]=255}gr.putImageData(GI,0,0)}
+
+/* ---------- запуск ---------- */
+window.setup=function(words,voiceEnd){
+  WORDS=words;VOICE_END=voiceEnd;const host=document.getElementById('scenes');let prev=0;
+  SC.forEach((s,i)=>{s.t0=s.start===0?0:s.start==='__END__'?voiceEnd+.5:find(s.start,prev);prev=s.t0;s.K={};let after=s.t0;for(const [k,ph] of Object.entries(s.keys)){s.K[k]=find(ph,after);after=s.K[k]+.02}s.root=el('div','scene',host);s.build(s.root)});
+  SC.forEach((s,i)=>s.t1=SC[i+1]?SC[i+1].t0:voiceEnd+6.5);TOTAL=SC[SC.length-1].t1;
+  initBg();buildCaps();return TOTAL;
+};
+window.renderAt=function(t){
+  drawBg(t);drawGrain(t);if(typeof EXTRA==='function')EXTRA(t);
+  let clock=null,flash=0;
+  SC.forEach((s,i)=>{const vis=t>=s.t0-.3&&t<s.t1+.3;s.root.style.display=vis?'block':'none';if(!vis)return;
+    const fi=i==0?1:pr(t,s.t0-.12,.25),fo=1-pr(t,s.t1-.12,.25);s.root.style.opacity=Math.min(fi,fo);
+    s.update(s.root,t,s.K,s.t0,s.t1);
+    if(!s.self){const z=1+.04*pr(t,s.t0,s.t1-s.t0);s.root.style.transform=`scale(${z*(1+.03*(1-eo(pr(t,s.t0-.12,.5))))})`}
+    if(t>=s.t0&&t<s.t1){clock=s.clock;if(i>0)flash=Math.max(flash,.1*(1-pr(t,s.t0,.18)))}});
+  const ck=document.getElementById('clock');ck.style.display=clock?'inline-block':'none';if(clock)ck.textContent=`ДЕНЬ 1 — ${clock}`;
+  document.getElementById('flash').style.opacity=flash;
+  drawCaps(t>VOICE_END+.4?-1:t);
+};
+</script>
+</body>
+</html>
