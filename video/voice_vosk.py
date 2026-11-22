@@ -50,7 +50,7 @@ for pi, par in enumerate(paras):
         toks = sen.split()
         n = len(toks)
         rate = RATE * (0.9 if n <= 3 else 1.0)  # короткие драматичные фразы медленнее
-        clean = re.sub(r'[«»"“”]', '', sen).replace('—', ',').replace('…', '.')
+        clean = re.sub(r'[«»"“”]', '', sen).replace('—', ',').replace('–', ' ').replace('…', '.')
         a = trim(s.synth_audio(clean, speaker_id=SP, speech_rate=rate).astype(np.float32) / 32768)
         dur = len(a) / SR
         w8 = [len(re.sub(r"[^\wё]", "", w.replace("+", ""))) + 1.5 for w in toks]
